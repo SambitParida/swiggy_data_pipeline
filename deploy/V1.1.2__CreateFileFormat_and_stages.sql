@@ -18,11 +18,12 @@ create file format if not exists stage_sch.csv_file_format
     record_delimiter = '\n'
     skip_header = 1
     field_optionally_enclosed_by = '"'
-    null_if = ('\\N')
+    null_if = ('\\N');
 
+-- Create stage --
 create stage stage_sch.csv_stg
     directory = (enabled = true)
-    comment = 'this is a snowflake internal stage'
+    comment = 'this is a snowflake internal stage';
 
 
 
