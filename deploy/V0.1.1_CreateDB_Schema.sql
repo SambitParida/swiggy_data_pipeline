@@ -1,7 +1,7 @@
 -- Use SysAdmin role to create objects --
 use role sysadmin;
 
--- Use Database --
+-- Use Database -
 use database sandbox;
 
 -- Create Schemas --

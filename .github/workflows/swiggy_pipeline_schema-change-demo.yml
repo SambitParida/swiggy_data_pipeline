@@ -1,4 +1,4 @@
-name: swiggy_pipeline_schema-change-demo
+name: swiggy-pipeline-schema-change-demo
 
 # Triggers the action based on branch and path. 
 on:
@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'scripts/**'
+      - 'deploy/**'
 
 #  workflow_dispatch:
 
