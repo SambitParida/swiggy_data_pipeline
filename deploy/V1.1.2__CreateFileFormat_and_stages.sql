@@ -21,8 +21,8 @@ create file format if not exists stage_sch.csv_file_format
     null_if = ('\\N');
 
 -- Create stage --
-create stage stage_sch.csv_stg
-    directory = (enabled = true)
+create stage if not exists stage_sch.csv_stg
+    directory = (enable = true)
     comment = 'this is a snowflake internal stage';
 
 
