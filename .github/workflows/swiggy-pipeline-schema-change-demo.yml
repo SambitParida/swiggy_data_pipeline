@@ -8,7 +8,7 @@ on:
     paths:
       - 'deploy/**'
 
-#  workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   schema-change-job:
