@@ -11,7 +11,7 @@ use database sandbox;
 use schema stage_sch;
 
 -- Create File Format --
-create file format if not exist stage_sch.csv_file_format
+create file format if not exists stage_sch.csv_file_format
     type = 'csv'
     compression = 'auto'
     field_delimiter = ','
