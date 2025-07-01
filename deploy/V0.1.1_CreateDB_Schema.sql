@@ -1,8 +1,8 @@
 -- Use SysAdmin role to create objects --
 use role sysadmin;
 
--- Create Database --
-create database is not exists sandbox;
+-- Use Database --
+use database sandbox;
 
 -- Create Schemas --
 create schema if not exists stage_sch;
