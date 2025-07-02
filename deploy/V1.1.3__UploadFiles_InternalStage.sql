@@ -1,7 +1,7 @@
 use database sandbox;
 use schema stage_sch;
 
-PUT file:///Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/Swiggy_Order_Data/01-location-csv/01.01-initial-load/location-5rows.csv @CSV_STG/initial/location;
+PUT 'file:///Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/Swiggy_Order_Data/01-location-csv/01.01-initial-load/location-5rows.csv' @CSV_STG/initial/location;
 
 -- PUT file:///Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/Swiggy_Order_Data/02-restaurant-csv/02.01-initial-load/restaurant-delhi+NCR.csv @CSV_STG/initial/restaurant;
 -- PUT file:///Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/Swiggy_Order_Data/02-restaurant-csv/02.02-delta-load/day-01-insert-restaurant-delhi+NCR.csv @CSV_STG/delta/restaurant;
