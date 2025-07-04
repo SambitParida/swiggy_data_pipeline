@@ -1,7 +1,7 @@
 use role sysadmin;
 use database sandbox;
 USE WAREHOUSE compute_wh;
-create table stage_sch.location(
+create or replace table stage_sch.location(
     locationid text,
     city text,
     state text,
@@ -14,6 +14,6 @@ create table stage_sch.location(
     _stg_file_load_ts timestamp,
     _stg_file_mdg text,
     _copy_data_ts timestamp default current_timestamp
-    )
-    comment = 'This is the location stage/raw where data will be copied from internal stage using copy command. This is as-is data representation from the source location.
-    All column are text datatype except the audit columns';
+    );
+    --comment = 'This is the location stage/raw where data will be copied from internal stage using copy command. This is as-is data representation from the source location.
+    --All column are text datatype except the audit columns';
