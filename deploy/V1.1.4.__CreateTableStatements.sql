@@ -36,6 +36,5 @@ create or replace table clean_sch.restaurant_location (
     stg_file_load_ts timestamp_ntz,
     stg_file_md5 string,
     copy_data_ts timestamp_ntz default current_timestamp
-)
-comment = 'Location entity under clean schema with appropriate data type under clean schema layer, data is populated using merge statement from the stage layer location table. This table does not support SCD2';
+);
 
