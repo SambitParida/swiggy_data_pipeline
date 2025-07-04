@@ -1,7 +1,7 @@
 use role sysadmin;
 use database sandbox;
 USE WAREHOUSE compute_wh;
-create or replace table stage_sch.location(
+create or replace table stage_sc.location(
     locationid text,
     city text,
     state text,
