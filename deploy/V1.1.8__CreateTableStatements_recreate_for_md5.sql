@@ -28,7 +28,6 @@ create or replace table clean_sch.restaurant_location (
     city_tier text(6),
     zip_code string(10) not null,
     active_flag string(10) not null,
-    active_flag string(10) not null,
     created_ts timestamp_tz not null,
     modified_ts timestamp_tz,
     -- additional audit columns
