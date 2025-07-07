@@ -17,6 +17,7 @@ create or replace table stage_sch.location(
     copy_data_ts timestamp default current_timestamp);
 
 /*Create tables in schema stage_sch */
+
 create or replace table clean_sch.restaurant_location (
     restaurant_location_sk number autoincrement primary key,
     location_id number not null unique,
