@@ -62,7 +62,7 @@ using
         TO_TIMESTAMP_TZ(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') as modified_ts,
         stg_file_name,
         stg_file_load_ts,
-        stg_file_mdg,
+        stg_file_md5,
         current_timestamp as copy_data_ts
         from stage_sch.location_stm
 ) as source 
@@ -90,7 +90,7 @@ when matched and (
         target.modified_ts = source.modified_ts,
         target.stg_file_name = source._stg_file_name,
         target.stg_file_load_ts = source._stg_file_load_ts,
-        target.stg_file_mdg = source.stg_file_mdg,
+        target.stg_file_md5 = source.stg_file_md5,
         target.copy_data_ts = source._copy_data_ts
 when not matched then
     insert (
@@ -107,7 +107,7 @@ when not matched then
         modified_ts,
         stg_file_name,
         stg_file_load_ts,
-        stg_file_mdg,
+        stg_file_md5,
         copy_data_ts
     )
     VALUES (
