@@ -2,7 +2,7 @@ use role sysadmin;
 use database sandbox;
 USE WAREHOUSE compute_wh;
 
-copy into stage_sch.location (locationid, city, state,zipcode, activeflag,createddate,modifieddate,stg_file_name,stg_file_load_ts,stg_file_mdg,copy_data_ts)
+copy into stage_sch.location (locationid, city, state,zipcode, activeflag,createddate,modifieddate,stg_file_name,stg_file_load_ts,stg_file_md5,copy_data_ts)
 from (
 select 
     t.$1::text as locationid,
