@@ -13,7 +13,7 @@ create or replace table stage_sch.location(
     modifieddate text,
     stg_file_name text,
     stg_file_load_ts timestamp,
-    stg_file_mdg text,
+    stg_file_md5 text,
     copy_data_ts timestamp default current_timestamp);
 
 /*Create tables in schema stage_sch */
