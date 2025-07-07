@@ -88,10 +88,10 @@ when matched and (
         target.Zip_Code = source.Zip_Code,
         target.Active_Flag = source.Active_Flag,
         target.modified_ts = source.modified_ts,
-        target.stg_file_name = source._stg_file_name,
-        target.stg_file_load_ts = source._stg_file_load_ts,
+        target.stg_file_name = source.stg_file_name,
+        target.stg_file_load_ts = source.stg_file_load_ts,
         target.stg_file_md5 = source.stg_file_md5,
-        target.copy_data_ts = source._copy_data_ts
+        target.copy_data_ts = source.copy_data_ts
 when not matched then
     insert (
         Location_ID,
