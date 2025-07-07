@@ -20,5 +20,3 @@ select
  file_format = (format_name = 'stage_sch.csv_file_format') 
 on_error = abort_statement;
 
-select * from stage_sch.location;
-select * from stage_sch.location_stm;
