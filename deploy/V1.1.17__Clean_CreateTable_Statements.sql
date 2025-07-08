@@ -23,10 +23,10 @@ create or replace table clean_sch.restaurant (
     modified_dt timestamp_tz,                                    -- last modified date, allows null if not modified
 
     -- additional audit columns
-    _stg_file_name string,                                       -- file name for audit
-    _stg_file_load_ts timestamp_ntz,                             -- file load timestamp for audit
-    _stg_file_md5 string,                                        -- md5 hash for file content for audit
-    _copy_data_ts timestamp_ntz default current_timestamp        -- timestamp when data is copied, defaults to current timestamp
+    stg_file_name string,                                       -- file name for audit
+    stg_file_load_ts timestamp_ntz,                             -- file load timestamp for audit
+    stg_file_md5 string,                                        -- md5 hash for file content for audit
+    copy_data_ts timestamp_ntz default current_timestamp        -- timestamp when data is copied, defaults to current timestamp
 );
 
 CREATE OR REPLACE TABLE CLEAN_SCH.CUSTOMER (
@@ -45,10 +45,10 @@ CREATE OR REPLACE TABLE CLEAN_SCH.CUSTOMER (
     MODIFIED_DT TIMESTAMP_TZ,                                    -- Record modification timestamp, allows NULL if not modified
 
     -- Additional audit columns
-    _STG_FILE_NAME STRING,                                       -- File name for audit
-    _STG_FILE_LOAD_TS TIMESTAMP_NTZ,                             -- File load timestamp
-    _STG_FILE_MD5 STRING,                                        -- MD5 hash for file content
-    _COPY_DATA_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP        -- Copy data timestamp
+    stg_file_name STRING,                                       -- File name for audit
+    stg_file_load_ts TIMESTAMP_NTZ,                             -- File load timestamp
+    stg_file_md5 STRING,                                        -- MD5 hash for file content
+    copy_data_ts TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP        -- Copy data timestamp
 );
 
 CREATE OR REPLACE TABLE CLEAN_SCH.CUSTOMER_ADDRESS (
@@ -71,10 +71,10 @@ CREATE OR REPLACE TABLE CLEAN_SCH.CUSTOMER_ADDRESS (
     MODIFIED_DATE TIMESTAMP_TZ,        -- Modified date as timestamp with time zone
 
     -- Audit columns with appropriate data types
-    _STG_FILE_NAME STRING,
-    _STG_FILE_LOAD_TS TIMESTAMP,
-    _STG_FILE_MD5 STRING,
-    _COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    stg_file_name STRING,
+    stg_file_load_ts TIMESTAMP,
+    stg_file_md5 STRING,
+    copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE OR REPLACE TABLE clean_sch.menu (
@@ -91,10 +91,10 @@ CREATE OR REPLACE TABLE clean_sch.menu (
     Modified_dt TIMESTAMP_NTZ,              -- Date when the record was last modified
 
     -- Audit columns for traceability
-    _STG_FILE_NAME STRING,                  -- Source file name
-    _STG_FILE_LOAD_TS TIMESTAMP_NTZ,        -- Timestamp when data was loaded from the staging layer
-    _STG_FILE_MD5 STRING,                   -- MD5 hash of the source file
-    _COPY_DATA_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP -- Timestamp when data was copied to the clean layer
+    stg_file_name STRING,                  -- Source file name
+    stg_file_load_ts TIMESTAMP_NTZ,        -- Timestamp when data was loaded from the staging layer
+    stg_file_md5 STRING,                   -- MD5 hash of the source file
+    copy_data_ts TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP -- Timestamp when data was copied to the clean layer
 );
 
 CREATE OR REPLACE TABLE clean_sch.delivery_agent (
@@ -111,10 +111,10 @@ CREATE OR REPLACE TABLE clean_sch.delivery_agent (
     modified_dt TIMESTAMP_NTZ,         -- Modified date as timestamp without timezone
 
     -- Audit columns with appropriate data types
-    _stg_file_name STRING,               -- Staging file name as string
-    _stg_file_load_ts TIMESTAMP,         -- Staging file load timestamp
-    _stg_file_md5 STRING,                -- Staging file MD5 hash as string
-    _copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Data copy timestamp with default value
+    stg_file_name STRING,               -- Staging file name as string
+    stg_file_load_ts TIMESTAMP,         -- Staging file load timestamp
+    stg_file_md5 STRING,                -- Staging file MD5 hash as string
+    copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Data copy timestamp with default value
 );
 
 CREATE OR REPLACE TABLE clean_sch.delivery (
@@ -130,10 +130,10 @@ CREATE OR REPLACE TABLE clean_sch.delivery (
     modified_date TIMESTAMP,                -- Modified date, converted to timestamp
 
     -- Audit columns with appropriate data types
-    _stg_file_name STRING,                  -- Source file name
-    _stg_file_load_ts TIMESTAMP,            -- Source file load timestamp
-    _stg_file_md5 STRING,                   -- MD5 checksum of the source file
-    _copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Metadata timestamp
+    stg_file_name STRING,                  -- Source file name
+    stg_file_load_ts TIMESTAMP,            -- Source file load timestamp
+    stg_file_md5 STRING,                   -- MD5 checksum of the source file
+    copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Metadata timestamp
 );
 
 CREATE OR REPLACE TABLE CLEAN_SCH.ORDERS (
@@ -149,10 +149,10 @@ CREATE OR REPLACE TABLE CLEAN_SCH.ORDERS (
     modified_dt timestamp_tz,                                    -- last modified date, allows null if not modified
 
     -- additional audit columns
-    _stg_file_name string,                                       -- file name for audit
-    _stg_file_load_ts timestamp_ntz,                             -- file load timestamp for audit
-    _stg_file_md5 string,                                        -- md5 hash for file content for audit
-    _copy_data_ts timestamp_ntz default current_timestamp        -- timestamp when data is copied, defaults to current timestamp
+    stg_file_name string,                                       -- file name for audit
+    stg_file_load_ts timestamp_ntz,                             -- file load timestamp for audit
+    stg_file_md5 string,                                        -- md5 hash for file content for audit
+    copy_data_ts timestamp_ntz default current_timestamp        -- timestamp when data is copied, defaults to current timestamp
 );
 
 CREATE OR REPLACE TABLE clean_sch.order_item (
@@ -167,8 +167,8 @@ CREATE OR REPLACE TABLE clean_sch.order_item (
     modified_dt TIMESTAMP,                -- Modified date of the order item
 
     -- Audit columns
-    _stg_file_name VARCHAR(255),            -- File name of the staging file
-    _stg_file_load_ts TIMESTAMP,            -- Timestamp when the file was loaded
-    _stg_file_md5 VARCHAR(255),             -- MD5 hash of the file for integrity check
-    _copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp when data is copied into the clean layer
+    stg_file_name VARCHAR(255),            -- File name of the staging file
+    stg_file_load_ts TIMESTAMP,            -- Timestamp when the file was loaded
+    stg_file_md5 VARCHAR(255),             -- MD5 hash of the file for integrity check
+    copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp when data is copied into the clean layer
 );
