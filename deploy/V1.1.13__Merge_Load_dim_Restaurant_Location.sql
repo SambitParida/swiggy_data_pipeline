@@ -8,13 +8,13 @@ using
     on target.location_is = source.location_id and
         target.active_flag = source.active_flag
     
-    when matched and source.metadata$action = 'DELETE' and ource.metadata$isupdate = TRUE
+    when matched and source.metadata$action = 'DELETE' and Source.metadata$isupdate = TRUE
 then
  update SET 
         target.eff_end_dt = current_timestamp(),
         target.current_flag = FALSE
 
-    when matched and ource.metadata$action = 'INSERT' and ource.metadata$isupdate = TRUE
+    when not matched and Source.metadata$action = 'INSERT' and Source.metadata$isupdate = TRUE
 then
     insert (
     RESTAURANT_LOCATION_HK ,
