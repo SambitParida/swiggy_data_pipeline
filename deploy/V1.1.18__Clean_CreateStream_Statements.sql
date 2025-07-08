@@ -13,7 +13,7 @@ on table clean_sch.customer
 comment = 'This is a standard stream object on the clean customer table to track insert, update, and delete changes';
 
 create or replace stream clean_sch.customeraddress_stm 
-on table clean_sch.customeraddress
+on table clean_sch.customer_address
 comment = 'This is a standard stream object on the clean customeraddress table to track insert, update, and delete changes';
 
 create or replace stream clean_sch.menu_stm 
@@ -21,7 +21,7 @@ on table clean_sch.menu
 comment = 'This is a standard stream object on the clean menu table to track insert, update, and delete changes';
 
 create or replace stream clean_sch.deliveryagent_stm 
-on table clean_sch.deliveryagent
+on table clean_sch.delivery_agent
 comment = 'This is a standard stream object on the clean deliveryagent table to track insert, update, and delete changes';
 
 create or replace stream clean_sch.delivery_stm 
@@ -33,6 +33,6 @@ on table clean_sch.orders
 comment = 'This is a standard stream object on the clean orders table to track insert, update, and delete changes';
 
 create or replace stream clean_sch.orderitem_stm 
-on table clean_sch.orderitem
+on table clean_sch.order_item
 comment = 'This is a standard stream object on the clean orderitem table to track insert, update, and delete changes';
 
