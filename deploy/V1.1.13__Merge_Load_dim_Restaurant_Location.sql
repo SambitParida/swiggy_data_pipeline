@@ -30,7 +30,8 @@ then
 	EFF_START_DT,
     EFF_END_DT,
     CURRENT_FLAG
-    ) values (
+    ) values 
+    (
         hash(sha1_hex(concat(source.CITY, source.STATE, source.STATE_CODE, source.ZIP_CODE))),
         source.LOCATION_ID,
         source.CITY,
@@ -45,7 +46,8 @@ then
         NULL,
         TRUE
     )
-    when not matched then
+
+    when not matched THEN
     insert (
     RESTAURANT_LOCATION_HK ,
 	LOCATION_ID ,

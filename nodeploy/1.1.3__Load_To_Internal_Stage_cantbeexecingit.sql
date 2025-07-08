@@ -32,3 +32,17 @@ PUT file:///Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/Swiggy_
 PUT file:///Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/Swiggy_Order_Data/10-delivery-csv/10.01-initial-load/* @CSV_STG/initial/delivery;
 PUT file:///Users/sambitparida/Desktop/Sambit/Learning/SnowflakePractice/Swiggy_Order_Data/10-delivery-csv/10.02-delta-load/* @CSV_STG/delta/delivery;
 
+LIST @STAGE_SCH.CSV_STG/initial;
+
+select 
+    t.$1::text as locationid,
+    t.$2::text as city,
+    t.$3::text as state,
+    t.$4::text as zipcode,
+    t.$5::text as activeflag,
+    t.$6::text as createddate,
+    t.$7::text as modifieddate    
+ from @stage_sch.csv_stg/initial/location
+ (file_format => 'stage_sch.csv_file_format') t
+
+
