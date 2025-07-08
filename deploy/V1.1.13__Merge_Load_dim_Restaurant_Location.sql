@@ -5,7 +5,7 @@ USE WAREHOUSE compute_wh;
 merge into CONSUMPTION_SCH.RESTAURANT_LOCATION_DIM AS target
 using
     clean_sch.restaurant_location_stm as source 
-    on target.location_is = source.location_id and
+    on target.location_id = source.location_id and
         target.active_flag = source.active_flag
     
     when matched and source.metadata$action = 'DELETE' and Source.metadata$isupdate = TRUE
