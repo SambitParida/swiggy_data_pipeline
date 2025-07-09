@@ -30,18 +30,18 @@ using
 on target.restaurant_id = source.restaurant_id
 when matched and 
 (       
-        target.name != source.name,
-        target.CUISINE_TYPE != source.CUISINE_TYPE,
-        target.PRICING_FOR_TWO != source.PRICING_FOR_TWO,
-        target.RESTAURANT_PHONE != source.RESTAURANT_PHONE,
-        target.OPERATING_HOURS != source.OPERATING_HOURS,
-        target.LOCATION_ID_FK != source.LOCATION_ID_FK,
-        target.LATITUDE != source.LATITUDE,
-        target.Active_Flag != source.Active_Flag,
-        target.OPEN_STATUS != source.OPEN_STATUS,
-        target.LOCALITY != source.LOCALITY,
-        target.RESTAURANT_ADDRESS != source.RESTAURANT_ADDRESS,
-        target.LATITUDE != source.LATITUDE,
+        target.name != source.name or
+        target.CUISINE_TYPE != source.CUISINE_TYPE or
+        target.PRICING_FOR_TWO != source.PRICING_FOR_TWO or
+        target.RESTAURANT_PHONE != source.RESTAURANT_PHONE or
+        target.OPERATING_HOURS != source.OPERATING_HOURS or
+        target.LOCATION_ID_FK != source.LOCATION_ID_FK or
+        target.LATITUDE != source.LATITUDE or
+        target.Active_Flag != source.Active_Flag or
+        target.OPEN_STATUS != source.OPEN_STATUS or
+        target.LOCALITY != source.LOCALITY or
+        target.RESTAURANT_ADDRESS != source.RESTAURANT_ADDRESS or
+        target.LATITUDE != source.LATITUDE or
         target.LONGITUDE != source.LONGITUDE
 )
  THEN 
