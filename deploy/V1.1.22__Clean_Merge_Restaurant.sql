@@ -67,7 +67,7 @@ when matched and
         target.copy_data_ts = source.copy_data_ts
 when not matched then
     insert (
-        Location_ID,
+        restaurant_id,
         name,
         CUISINE_TYPE,
         PRICING_FOR_TWO,
@@ -79,7 +79,7 @@ when not matched then
         LOCALITY,
         RESTAURANT_ADDRESS,
         LATITUDE,
-        LONGITUDE
+        LONGITUDE,
         created_dt,
         modified_date,
         stg_file_name,
@@ -88,7 +88,7 @@ when not matched then
         copy_data_ts
     )
     VALUES (
-        source.Location_ID,
+        source.restaurant_id,
         source.name,
         source.CUISINE_TYPE,
         source.PRICING_FOR_TWO,
