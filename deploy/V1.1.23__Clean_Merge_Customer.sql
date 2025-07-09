@@ -34,6 +34,8 @@ when matched and
         target.DOB != source.DOB or
         target.ANNIVERSARY != source.ANNIVERSARY or
         target.PREFERENCES != source.PREFERENCES 
+
+)
  THEN 
     UPDATE SET 
         target.name = source.name,
