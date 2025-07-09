@@ -94,7 +94,7 @@ when not matched then
         source.RESTAURANT_PHONE,
         source.OPERATING_HOURS,
         source.LOCATION_ID_FK,
-        source.Active_Flag
+        source.Active_Flag,
         source.LATITUDE,
         source.OPEN_STATUS,
         source.LOCALITY,
