@@ -51,7 +51,7 @@ THEN UPDATE SET
         target.stg_file_name = source.stg_file_name,
         target.stg_file_load_ts = source.stg_file_load_ts,
         target.stg_file_md5 = source.stg_file_md5,
-        target.current_timestamp = source.copy_data_ts
+        target.copy_data_ts = source.copy_data_ts
 
 when not matched then insert
     (
