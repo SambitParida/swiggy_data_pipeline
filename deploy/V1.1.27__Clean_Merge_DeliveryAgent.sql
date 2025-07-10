@@ -8,7 +8,7 @@ merge into
     clean_sch.DELIVERY_AGENT as target using (
         select
             try_cast(DELIVERYAGENTID as number) as DELIVERY_AGENT_ID,
-            try_cast(NAME as number) as NAME,
+            try_cast(NAME as string) as NAME,
             try_cast(PHONE as string) as PHONE,
             try_cast(VEHICLETYPE as string) as VEHICLE_TYPE,
             try_cast(LOCATIONID as NUMBER) as LOCATION_ID_FK,
