@@ -1,26 +1,23 @@
-use role sysadmin;
-use database sandbox;
-USE WAREHOUSE compute_wh;
-
-/*Create tables in schema stage_sch */
-
-create or replace table clean_sch.restaurant_location (
-    restaurant_location_sk number autoincrement primary key,
-    location_id number not null unique,
-    city string(100) not null,
-    state string(100) not null,
-    state_code string(2) not null,
-    is_union_territory boolean not null default false,
-    capital_city_flag boolean not null default false,
-    city_tier text(6),
-    zip_code string(10) not null,
-    active_flag string(10) not null,
-    created_ts timestamp_tz not null,
-    modified_ts timestamp_tz,
-    -- additional audit columns
-    stg_file_name string,
-    stg_file_load_ts timestamp_ntz,
-    stg_file_md5 string,
-    copy_data_ts timestamp_ntz default current_timestamp
-);
-
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+/*CREATE TABLES IN SCHEMA STAGE_SCH */
+CREATE OR REPLACE TABLE CLEAN_SCH.RESTAURANT_LOCATION (
+        RESTAURANT_LOCATION_SK NUMBER AUTOINCREMENT PRIMARY KEY,
+        LOCATION_ID NUMBER NOT NULL UNIQUE,
+        CITY STRING(100) NOT NULL,
+        STATE STRING(100) NOT NULL,
+        STATE_CODE STRING(2) NOT NULL,
+        IS_UNION_TERRITORY BOOLEAN NOT NULL DEFAULT FALSE,
+        CAPITAL_CITY_FLAG BOOLEAN NOT NULL DEFAULT FALSE,
+        CITY_TIER TEXT(6),
+        ZIP_CODE STRING(10) NOT NULL,
+        ACTIVE_FLAG STRING(10) NOT NULL,
+        CREATED_TS TIMESTAMP_TZ NOT NULL,
+        MODIFIED_TS TIMESTAMP_TZ,
+        -- ADDITIONAL AUDIT COLUMNS
+        STG_FILE_NAME STRING,
+        STG_FILE_LOAD_TS TIMESTAMP_NTZ,
+        STG_FILE_MD5 STRING,
+        COPY_DATA_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP
+    );

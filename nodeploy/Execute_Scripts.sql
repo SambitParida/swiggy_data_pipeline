@@ -27,3 +27,26 @@ on_error = abort_statement;
 --Cleaning Bad Data from stage table and making the stream clean --
 create table stage_sch.temp_stream as select * from stage_sch.location_stm;
 delete from stage_sch.location where locationid like '%|%';
+
+ select 
+        t.$1::text as orderitemid,
+        t.$2::text as orderid,
+        t.$3::text as menuid,
+        t.$4::text as quantity,
+        t.$5::text as price,
+        t.$6::text as subtotal,
+        t.$7::text as createddate,
+        t.$8::text as modifieddate,
+        metadata$filename as stg_file_name,
+        metadata$file_last_modified as stg_file_load_ts,
+        metadata$file_content_key as stg_file_md5,
+        current_timestamp as copy_data_ts
+    from @stage_sch.csv_stg/initial/order_item/
+ (file_format =>  'stage_sch.csv_file_format') t;
+
+ list @stage_sch.csv_stg/initial/delivery
+
+CREATE OR REPLACE WAREHOUSE data_load_wh WAREHOUSE_SIZE=LARGE INITIALLY_SUSPENDED=TRUE;
+select current_role()
+use role accountadmin
+grant usage on warehouse compute_wh to public;
