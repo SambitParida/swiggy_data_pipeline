@@ -67,8 +67,8 @@ CREATE OR REPLACE TABLE CLEAN_SCH.CUSTOMER_ADDRESS (
     COORDINATES STRING,                -- Coordinates as string
     PRIMARY_FLAG STRING,               -- Primary flag as string
     ADDRESS_TYPE STRING,               -- Address type as string
-    CREATED_DATE TIMESTAMP_TZ,         -- Created date as timestamp with time zone
-    MODIFIED_DATE TIMESTAMP_TZ,        -- Modified date as timestamp with time zone
+    CREATED_DT TIMESTAMP_TZ,         -- Created date as timestamp with time zone
+    MODIFIED_DT TIMESTAMP_TZ,        -- Modified date as timestamp with time zone
 
     -- Audit columns with appropriate data types
     stg_file_name STRING,
@@ -126,8 +126,8 @@ CREATE OR REPLACE TABLE clean_sch.delivery (
     estimated_time STRING,                  -- Estimated time, stored as a string
     customer_address_id_fk NUMBER NOT NULL  comment 'Customer Address FK (Source System)',                      -- Foreign key reference, converted to numeric type
     delivery_date TIMESTAMP,                -- Delivery date, converted to timestamp
-    created_date TIMESTAMP,                 -- Created date, converted to timestamp
-    modified_date TIMESTAMP,                -- Modified date, converted to timestamp
+    CREATED_DT TIMESTAMP,                 -- Created date, converted to timestamp
+    MODIFIED_DT TIMESTAMP,                -- Modified date, converted to timestamp
 
     -- Audit columns with appropriate data types
     stg_file_name STRING,                  -- Source file name
