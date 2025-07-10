@@ -23,7 +23,7 @@ merge into
             current_timestamp as copy_data_ts
         from
             stage_sch.menu_stm
-    ) as source on target.ADDRESS_ID = source.ADDRESS_ID
+    ) as source on target.MENU_ID = source.MENU_ID
 when matched and
     (
         target.RESTAURANT_ID_FK != source.RESTAURANT_ID_FK
