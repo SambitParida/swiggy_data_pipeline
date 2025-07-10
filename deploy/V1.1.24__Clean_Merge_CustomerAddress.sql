@@ -5,7 +5,7 @@ use database sandbox;
 USE WAREHOUSE compute_wh;
 
 merge into
-    clean_sch.customeraddress as target using (
+    clean_sch.customer_address as target using (
         select
             try_cast(addressid as number) as ADDRESS_ID,
             try_cast(customerid as number) as CUSTOMER_ID_FK,
