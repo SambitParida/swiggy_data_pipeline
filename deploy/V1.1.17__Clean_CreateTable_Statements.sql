@@ -1,174 +1,292 @@
-use role sysadmin;
-use database sandbox;
-use schema stage_sch;
-USE WAREHOUSE compute_wh;
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE SCHEMA CLEAN_SCH;
+USE WAREHOUSE COMPUTE_WH;
 
--- the restaurant table where data types are defined. 
-create or replace table clean_sch.restaurant (
-    restaurant_sk number autoincrement primary key,              -- primary key with auto-increment
-    restaurant_id number unique,                                        -- restaurant id without auto-increment
-    name string(100) not null,                                   -- restaurant name, required field
-    cuisine_type string,                                         -- type of cuisine offered
-    pricing_for_two number(10, 2),                               -- pricing for two people, up to 10 digits with 2 decimal places
-    restaurant_phone string(15) WITH TAG (common.pii_policy_tag = 'SENSITIVE'),                                 -- phone number, supports 10-digit or international format
-    operating_hours string(100),                                  -- restaurant operating hours
-    location_id_fk number,                                       -- reference id for location, defaulted to 1
-    active_flag string(10),                                      -- indicates if the restaurant is active
-    open_status string(10),                                      -- indicates if the restaurant is currently open
-    locality string(100),                                        -- locality of the restaurant
-    restaurant_address string,                                   -- address of the restaurant, supports longer text
-    latitude number(9, 6),                                       -- latitude with 6 decimal places for precision
-    longitude number(9, 6),                                      -- longitude with 6 decimal places for precision
-    created_dt timestamp_tz,                                     -- record creation date
-    modified_dt timestamp_tz,                                    -- last modified date, allows null if not modified
-
-    -- additional audit columns
-    stg_file_name string,                                       -- file name for audit
-    stg_file_load_ts timestamp_ntz,                             -- file load timestamp for audit
-    stg_file_md5 string,                                        -- md5 hash for file content for audit
-    copy_data_ts timestamp_ntz default current_timestamp        -- timestamp when data is copied, defaults to current timestamp
-);
-
+CREATE OR REPLACE TABLE CLEAN_SCH.RESTAURANT_LOCATION (
+        RESTAURANT_LOCATION_SK NUMBER AUTOINCREMENT PRIMARY KEY,
+        LOCATION_ID NUMBER NOT NULL UNIQUE,
+        CITY STRING(100) NOT NULL,
+        STATE STRING(100) NOT NULL,
+        STATE_CODE STRING(2) NOT NULL,
+        IS_UNION_TERRITORY BOOLEAN NOT NULL DEFAULT FALSE,
+        CAPITAL_CITY_FLAG BOOLEAN NOT NULL DEFAULT FALSE,
+        CITY_TIER TEXT(6),
+        ZIP_CODE STRING(10) NOT NULL,
+        ACTIVE_FLAG STRING(10) NOT NULL,
+        CREATED_TS TIMESTAMP_TZ NOT NULL,
+        MODIFIED_TS TIMESTAMP_TZ,
+        -- ADDITIONAL AUDIT COLUMNS
+        STG_FILE_NAME STRING,
+        STG_FILE_LOAD_TS TIMESTAMP_NTZ,
+        STG_FILE_MD5 STRING,
+        COPY_DATA_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP
+    );
+-- THE RESTAURANT TABLE WHERE DATA TYPES ARE DEFINED. 
+CREATE OR REPLACE TABLE CLEAN_SCH.RESTAURANT (
+        RESTAURANT_SK NUMBER AUTOINCREMENT PRIMARY KEY,
+        -- PRIMARY KEY WITH AUTO-INCREMENT
+        RESTAURANT_ID NUMBER UNIQUE,
+        -- RESTAURANT ID WITHOUT AUTO-INCREMENT
+        NAME STRING(100) NOT NULL,
+        -- RESTAURANT NAME, REQUIRED FIELD
+        CUISINE_TYPE STRING,
+        -- TYPE OF CUISINE OFFERED
+        PRICING_FOR_TWO NUMBER(10, 2),
+        -- PRICING FOR TWO PEOPLE, UP TO 10 DIGITS WITH 2 DECIMAL PLACES
+        RESTAURANT_PHONE STRING(15) WITH TAG (COMMON.PII_POLICY_TAG = 'SENSITIVE'),
+        -- PHONE NUMBER, SUPPORTS 10-DIGIT OR INTERNATIONAL FORMAT
+        OPERATING_HOURS STRING(100),
+        -- RESTAURANT OPERATING HOURS
+        LOCATION_ID_FK NUMBER,
+        -- REFERENCE ID FOR LOCATION, DEFAULTED TO 1
+        ACTIVE_FLAG STRING(10),
+        -- INDICATES IF THE RESTAURANT IS ACTIVE
+        OPEN_STATUS STRING(10),
+        -- INDICATES IF THE RESTAURANT IS CURRENTLY OPEN
+        LOCALITY STRING(100),
+        -- LOCALITY OF THE RESTAURANT
+        RESTAURANT_ADDRESS STRING,
+        -- ADDRESS OF THE RESTAURANT, SUPPORTS LONGER TEXT
+        LATITUDE NUMBER(9, 6),
+        -- LATITUDE WITH 6 DECIMAL PLACES FOR PRECISION
+        LONGITUDE NUMBER(9, 6),
+        -- LONGITUDE WITH 6 DECIMAL PLACES FOR PRECISION
+        CREATED_DT TIMESTAMP_TZ,
+        -- RECORD CREATION DATE
+        MODIFIED_DT TIMESTAMP_TZ,
+        -- LAST MODIFIED DATE, ALLOWS NULL IF NOT MODIFIED
+        -- ADDITIONAL AUDIT COLUMNS
+        STG_FILE_NAME STRING,
+        -- FILE NAME FOR AUDIT
+        STG_FILE_LOAD_TS TIMESTAMP_NTZ,
+        -- FILE LOAD TIMESTAMP FOR AUDIT
+        STG_FILE_MD5 STRING,
+        -- MD5 HASH FOR FILE CONTENT FOR AUDIT
+        COPY_DATA_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP -- TIMESTAMP WHEN DATA IS COPIED, DEFAULTS TO CURRENT TIMESTAMP
+    );
 CREATE OR REPLACE TABLE CLEAN_SCH.CUSTOMER (
-    
-    CUSTOMER_SK NUMBER AUTOINCREMENT PRIMARY KEY,                -- Auto-incremented primary key
-    CUSTOMER_ID STRING NOT NULL,                                 -- Customer ID
-    NAME STRING(100) NOT NULL,                                   -- Customer name
-    MOBILE STRING(15)  WITH TAG (common.pii_policy_tag = 'PII'),                                           -- Mobile number, accommodating international format
-    EMAIL STRING(100) WITH TAG (common.pii_policy_tag = 'EMAIL'),                                           -- Email
-    LOGIN_BY_USING STRING(50),                                   -- Method of login (e.g., Social, Google, etc.)
-    GENDER STRING(10)  WITH TAG (common.pii_policy_tag = 'PII'),                                           -- Gender
-    DOB DATE WITH TAG (common.pii_policy_tag = 'PII'),                                                    -- Date of birth in DATE format
-    ANNIVERSARY DATE,                                            -- Anniversary in DATE format
-    PREFERENCES STRING,                                          -- Customer preferences
-    CREATED_DT TIMESTAMP_TZ DEFAULT CURRENT_TIMESTAMP,           -- Record creation timestamp
-    MODIFIED_DT TIMESTAMP_TZ,                                    -- Record modification timestamp, allows NULL if not modified
-
-    -- Additional audit columns
-    stg_file_name STRING,                                       -- File name for audit
-    stg_file_load_ts TIMESTAMP_NTZ,                             -- File load timestamp
-    stg_file_md5 STRING,                                        -- MD5 hash for file content
-    copy_data_ts TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP        -- Copy data timestamp
-);
-
+        CUSTOMER_SK NUMBER AUTOINCREMENT PRIMARY KEY,
+        -- AUTO-INCREMENTED PRIMARY KEY
+        CUSTOMER_ID STRING NOT NULL,
+        -- CUSTOMER ID
+        NAME STRING(100) NOT NULL,
+        -- CUSTOMER NAME
+        MOBILE STRING(15) WITH TAG (COMMON.PII_POLICY_TAG = 'PII'),
+        -- MOBILE NUMBER, ACCOMMODATING INTERNATIONAL FORMAT
+        EMAIL STRING(100) WITH TAG (COMMON.PII_POLICY_TAG = 'EMAIL'),
+        -- EMAIL
+        LOGIN_BY_USING STRING(50),
+        -- METHOD OF LOGIN (E.G., SOCIAL, GOOGLE, ETC.)
+        GENDER STRING(10) WITH TAG (COMMON.PII_POLICY_TAG = 'PII'),
+        -- GENDER
+        DOB DATE WITH TAG (COMMON.PII_POLICY_TAG = 'PII'),
+        -- DATE OF BIRTH IN DATE FORMAT
+        ANNIVERSARY DATE,
+        -- ANNIVERSARY IN DATE FORMAT
+        PREFERENCES STRING,
+        -- CUSTOMER PREFERENCES
+        CREATED_DT TIMESTAMP_TZ DEFAULT CURRENT_TIMESTAMP,
+        -- RECORD CREATION TIMESTAMP
+        MODIFIED_DT TIMESTAMP_TZ,
+        -- RECORD MODIFICATION TIMESTAMP, ALLOWS NULL IF NOT MODIFIED
+        -- ADDITIONAL AUDIT COLUMNS
+        STG_FILE_NAME STRING,
+        -- FILE NAME FOR AUDIT
+        STG_FILE_LOAD_TS TIMESTAMP_NTZ,
+        -- FILE LOAD TIMESTAMP
+        STG_FILE_MD5 STRING,
+        -- MD5 HASH FOR FILE CONTENT
+        COPY_DATA_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP -- COPY DATA TIMESTAMP
+    );
 CREATE OR REPLACE TABLE CLEAN_SCH.CUSTOMER_ADDRESS (
-    CUSTOMER_ADDRESS_SK NUMBER AUTOINCREMENT PRIMARY KEY comment 'Surrogate Key (EWH)',                -- Auto-incremented primary key
-    ADDRESS_ID INT comment 'Primary Key (Source Data)',                 -- Primary key as string
-    CUSTOMER_ID_FK INT comment 'Customer FK (Source Data)',                -- Foreign key reference as string (no constraint in Snowflake)
-    FLAT_NO STRING,                    -- Flat number as string
-    HOUSE_NO STRING,                   -- House number as string
-    FLOOR STRING,                      -- Floor as string
-    BUILDING STRING,                   -- Building name as string
-    LANDMARK STRING,                   -- Landmark as string
-    locality STRING,                   -- locality as string
-    CITY STRING,                       -- City as string
-    STATE STRING,                      -- State as string
-    PINCODE STRING,                    -- Pincode as string
-    COORDINATES STRING,                -- Coordinates as string
-    PRIMARY_FLAG STRING,               -- Primary flag as string
-    ADDRESS_TYPE STRING,               -- Address type as string
-    CREATED_DT TIMESTAMP_TZ,         -- Created date as timestamp with time zone
-    MODIFIED_DT TIMESTAMP_TZ,        -- Modified date as timestamp with time zone
-
-    -- Audit columns with appropriate data types
-    stg_file_name STRING,
-    stg_file_load_ts TIMESTAMP,
-    stg_file_md5 STRING,
-    copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE OR REPLACE TABLE clean_sch.menu (
-    Menu_SK INT AUTOINCREMENT PRIMARY KEY comment 'Surrogate Key (EDW)',  -- Auto-incrementing primary key for internal tracking
-    Menu_ID INT NOT NULL UNIQUE comment 'Primary Key (Source System)' ,             -- Unique and non-null Menu_ID
-    Restaurant_ID_FK INT comment 'Restaurant FK(Source System)' ,                      -- Identifier for the restaurant
-    Item_Name STRING not null,                        -- Name of the menu item
-    Description STRING not null,                     -- Description of the menu item
-    Price DECIMAL(10, 2) not null,                   -- Price as a numeric value with 2 decimal places
-    Category STRING,                        -- Food category (e.g., North Indian)
-    Availability BOOLEAN,                   -- Availability status (True/False)
-    Item_Type STRING,                        -- Dietary classification (e.g., Vegan)
-    Created_dt TIMESTAMP_NTZ,               -- Date when the record was created
-    Modified_dt TIMESTAMP_NTZ,              -- Date when the record was last modified
-
-    -- Audit columns for traceability
-    stg_file_name STRING,                  -- Source file name
-    stg_file_load_ts TIMESTAMP_NTZ,        -- Timestamp when data was loaded from the staging layer
-    stg_file_md5 STRING,                   -- MD5 hash of the source file
-    copy_data_ts TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP -- Timestamp when data was copied to the clean layer
-);
-
-CREATE OR REPLACE TABLE clean_sch.delivery_agent (
-    delivery_agent_sk INT AUTOINCREMENT PRIMARY KEY comment 'Surrogate Key (EDW)', -- Primary key with auto-increment
-    delivery_agent_id INT NOT NULL UNIQUE comment 'Primary Key (Source System)',               -- Delivery agent ID as integer
-    name STRING NOT NULL,                -- Name as string, required field
-    phone STRING NOT NULL,                 -- Phone as string, unique constraint
-    vehicle_type STRING NOT NULL,                 -- Vehicle type as string
-    location_id_fk INT comment 'Location FK(Source System)',                     -- Location ID as integer
-    status STRING,                       -- Status as string
-    gender STRING,                       -- Gender as string
-    rating number(4,2),                        -- Rating as float
-    created_dt TIMESTAMP_NTZ,          -- Created date as timestamp without timezone
-    modified_dt TIMESTAMP_NTZ,         -- Modified date as timestamp without timezone
-
-    -- Audit columns with appropriate data types
-    stg_file_name STRING,               -- Staging file name as string
-    stg_file_load_ts TIMESTAMP,         -- Staging file load timestamp
-    stg_file_md5 STRING,                -- Staging file MD5 hash as string
-    copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Data copy timestamp with default value
-);
-
-CREATE OR REPLACE TABLE clean_sch.delivery (
-    delivery_sk INT AUTOINCREMENT PRIMARY KEY comment 'Surrogate Key (EDW)', -- Primary key with auto-increment
-    delivery_id INT NOT NULL comment 'Primary Key (Source System)',
-    order_id_fk NUMBER NOT NULL comment 'Order FK (Source System)',                        -- Foreign key reference, converted to numeric type
-    delivery_agent_id_fk NUMBER NOT NULL comment 'Delivery Agent FK (Source System)',               -- Foreign key reference, converted to numeric type
-    delivery_status STRING,                 -- Delivery status, stored as a string
-    estimated_time STRING,                  -- Estimated time, stored as a string
-    customer_address_id_fk NUMBER NOT NULL  comment 'Customer Address FK (Source System)',                      -- Foreign key reference, converted to numeric type
-    delivery_date TIMESTAMP,                -- Delivery date, converted to timestamp
-    CREATED_DT TIMESTAMP,                 -- Created date, converted to timestamp
-    MODIFIED_DT TIMESTAMP,                -- Modified date, converted to timestamp
-
-    -- Audit columns with appropriate data types
-    stg_file_name STRING,                  -- Source file name
-    stg_file_load_ts TIMESTAMP,            -- Source file load timestamp
-    stg_file_md5 STRING,                   -- MD5 checksum of the source file
-    copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Metadata timestamp
-);
-
+        CUSTOMER_ADDRESS_SK NUMBER AUTOINCREMENT PRIMARY KEY COMMENT 'SURROGATE KEY (EWH)',
+        -- AUTO-INCREMENTED PRIMARY KEY
+        ADDRESS_ID INT COMMENT 'PRIMARY KEY (SOURCE DATA)',
+        -- PRIMARY KEY AS STRING
+        CUSTOMER_ID_FK INT COMMENT 'CUSTOMER FK (SOURCE DATA)',
+        -- FOREIGN KEY REFERENCE AS STRING (NO CONSTRAINT IN SNOWFLAKE)
+        FLAT_NO STRING,
+        -- FLAT NUMBER AS STRING
+        HOUSE_NO STRING,
+        -- HOUSE NUMBER AS STRING
+        FLOOR STRING,
+        -- FLOOR AS STRING
+        BUILDING STRING,
+        -- BUILDING NAME AS STRING
+        LANDMARK STRING,
+        -- LANDMARK AS STRING
+        LOCALITY STRING,
+        -- LOCALITY AS STRING
+        CITY STRING,
+        -- CITY AS STRING
+        STATE STRING,
+        -- STATE AS STRING
+        PINCODE STRING,
+        -- PINCODE AS STRING
+        COORDINATES STRING,
+        -- COORDINATES AS STRING
+        PRIMARY_FLAG STRING,
+        -- PRIMARY FLAG AS STRING
+        ADDRESS_TYPE STRING,
+        -- ADDRESS TYPE AS STRING
+        CREATED_DT TIMESTAMP_TZ,
+        -- CREATED DATE AS TIMESTAMP WITH TIME ZONE
+        MODIFIED_DT TIMESTAMP_TZ,
+        -- MODIFIED DATE AS TIMESTAMP WITH TIME ZONE
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME STRING,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 STRING,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+CREATE OR REPLACE TABLE CLEAN_SCH.MENU (
+        MENU_SK INT AUTOINCREMENT PRIMARY KEY COMMENT 'SURROGATE KEY (EDW)',
+        -- AUTO-INCREMENTING PRIMARY KEY FOR INTERNAL TRACKING
+        MENU_ID INT NOT NULL UNIQUE COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- UNIQUE AND NON-NULL MENU_ID
+        RESTAURANT_ID_FK INT COMMENT 'RESTAURANT FK(SOURCE SYSTEM)',
+        -- IDENTIFIER FOR THE RESTAURANT
+        ITEM_NAME STRING NOT NULL,
+        -- NAME OF THE MENU ITEM
+        DESCRIPTION STRING NOT NULL,
+        -- DESCRIPTION OF THE MENU ITEM
+        PRICE DECIMAL(10, 2) NOT NULL,
+        -- PRICE AS A NUMERIC VALUE WITH 2 DECIMAL PLACES
+        CATEGORY STRING,
+        -- FOOD CATEGORY (E.G., NORTH INDIAN)
+        AVAILABILITY BOOLEAN,
+        -- AVAILABILITY STATUS (TRUE/FALSE)
+        ITEM_TYPE STRING,
+        -- DIETARY CLASSIFICATION (E.G., VEGAN)
+        CREATED_DT TIMESTAMP_NTZ,
+        -- DATE WHEN THE RECORD WAS CREATED
+        MODIFIED_DT TIMESTAMP_NTZ,
+        -- DATE WHEN THE RECORD WAS LAST MODIFIED
+        -- AUDIT COLUMNS FOR TRACEABILITY
+        STG_FILE_NAME STRING,
+        -- SOURCE FILE NAME
+        STG_FILE_LOAD_TS TIMESTAMP_NTZ,
+        -- TIMESTAMP WHEN DATA WAS LOADED FROM THE STAGING LAYER
+        STG_FILE_MD5 STRING,
+        -- MD5 HASH OF THE SOURCE FILE
+        COPY_DATA_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP -- TIMESTAMP WHEN DATA WAS COPIED TO THE CLEAN LAYER
+    );
+CREATE OR REPLACE TABLE CLEAN_SCH.DELIVERY_AGENT (
+        DELIVERY_AGENT_SK INT AUTOINCREMENT PRIMARY KEY COMMENT 'SURROGATE KEY (EDW)',
+        -- PRIMARY KEY WITH AUTO-INCREMENT
+        DELIVERY_AGENT_ID INT NOT NULL UNIQUE COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- DELIVERY AGENT ID AS INTEGER
+        NAME STRING NOT NULL,
+        -- NAME AS STRING, REQUIRED FIELD
+        PHONE STRING NOT NULL,
+        -- PHONE AS STRING, UNIQUE CONSTRAINT
+        VEHICLE_TYPE STRING NOT NULL,
+        -- VEHICLE TYPE AS STRING
+        LOCATION_ID_FK INT COMMENT 'LOCATION FK(SOURCE SYSTEM)',
+        -- LOCATION ID AS INTEGER
+        STATUS STRING,
+        -- STATUS AS STRING
+        GENDER STRING,
+        -- GENDER AS STRING
+        RATING NUMBER(4, 2),
+        -- RATING AS FLOAT
+        CREATED_DT TIMESTAMP_NTZ,
+        -- CREATED DATE AS TIMESTAMP WITHOUT TIMEZONE
+        MODIFIED_DT TIMESTAMP_NTZ,
+        -- MODIFIED DATE AS TIMESTAMP WITHOUT TIMEZONE
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME STRING,
+        -- STAGING FILE NAME AS STRING
+        STG_FILE_LOAD_TS TIMESTAMP,
+        -- STAGING FILE LOAD TIMESTAMP
+        STG_FILE_MD5 STRING,
+        -- STAGING FILE MD5 HASH AS STRING
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- DATA COPY TIMESTAMP WITH DEFAULT VALUE
+    );
+CREATE OR REPLACE TABLE CLEAN_SCH.DELIVERY (
+        DELIVERY_SK INT AUTOINCREMENT PRIMARY KEY COMMENT 'SURROGATE KEY (EDW)',
+        -- PRIMARY KEY WITH AUTO-INCREMENT
+        DELIVERY_ID INT NOT NULL COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        ORDER_ID_FK NUMBER NOT NULL COMMENT 'ORDER FK (SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE, CONVERTED TO NUMERIC TYPE
+        DELIVERY_AGENT_ID_FK NUMBER NOT NULL COMMENT 'DELIVERY AGENT FK (SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE, CONVERTED TO NUMERIC TYPE
+        DELIVERY_STATUS STRING,
+        -- DELIVERY STATUS, STORED AS A STRING
+        ESTIMATED_TIME STRING,
+        -- ESTIMATED TIME, STORED AS A STRING
+        CUSTOMER_ADDRESS_ID_FK NUMBER NOT NULL COMMENT 'CUSTOMER ADDRESS FK (SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE, CONVERTED TO NUMERIC TYPE
+        DELIVERY_DATE TIMESTAMP,
+        -- DELIVERY DATE, CONVERTED TO TIMESTAMP
+        CREATED_DT TIMESTAMP,
+        -- CREATED DATE, CONVERTED TO TIMESTAMP
+        MODIFIED_DT TIMESTAMP,
+        -- MODIFIED DATE, CONVERTED TO TIMESTAMP
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME STRING,
+        -- SOURCE FILE NAME
+        STG_FILE_LOAD_TS TIMESTAMP,
+        -- SOURCE FILE LOAD TIMESTAMP
+        STG_FILE_MD5 STRING,
+        -- MD5 CHECKSUM OF THE SOURCE FILE
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- METADATA TIMESTAMP
+    );
 CREATE OR REPLACE TABLE CLEAN_SCH.ORDERS (
-    ORDER_SK NUMBER AUTOINCREMENT PRIMARY KEY comment 'Surrogate Key (EDW)',                -- Auto-incremented primary key
-    ORDER_ID BIGINT UNIQUE comment 'Primary Key (Source System)',                      -- Primary key inferred as BIGINT
-    CUSTOMER_ID_FK BIGINT comment 'Customer FK(Source System)',                   -- Foreign key inferred as BIGINT
-    RESTAURANT_ID_FK BIGINT comment 'Restaurant FK(Source System)',                 -- Foreign key inferred as BIGINT
-    ORDER_DATE TIMESTAMP,                 -- Order date inferred as TIMESTAMP
-    TOTAL_AMOUNT DECIMAL(10, 2),          -- Total amount inferred as DECIMAL with two decimal places
-    STATUS STRING,                        -- Status as STRING
-    PAYMENT_METHOD STRING,                -- Payment method as STRING
-    created_dt timestamp_tz,                                     -- record creation date
-    modified_dt timestamp_tz,                                    -- last modified date, allows null if not modified
-
-    -- additional audit columns
-    stg_file_name string,                                       -- file name for audit
-    stg_file_load_ts timestamp_ntz,                             -- file load timestamp for audit
-    stg_file_md5 string,                                        -- md5 hash for file content for audit
-    copy_data_ts timestamp_ntz default current_timestamp        -- timestamp when data is copied, defaults to current timestamp
-);
-
-CREATE OR REPLACE TABLE clean_sch.order_item (
-    order_item_sk NUMBER AUTOINCREMENT primary key comment 'Surrogate Key (EDW)',    -- Auto-incremented unique identifier for each order item
-    order_item_id NUMBER  NOT NULL UNIQUE comment 'Primary Key (Source System)',
-    order_id_fk NUMBER  NOT NULL comment 'Order FK(Source System)',                  -- Foreign key reference for Order ID
-    menu_id_fk NUMBER  NOT NULL comment 'Menu FK(Source System)',                   -- Foreign key reference for Menu ID
-    quantity NUMBER(10, 2),                 -- Quantity as a decimal number
-    price NUMBER(10, 2),                    -- Price as a decimal number
-    subtotal NUMBER(10, 2),                 -- Subtotal as a decimal number
-    created_dt TIMESTAMP,                 -- Created date of the order item
-    modified_dt TIMESTAMP,                -- Modified date of the order item
-
-    -- Audit columns
-    stg_file_name VARCHAR(255),            -- File name of the staging file
-    stg_file_load_ts TIMESTAMP,            -- Timestamp when the file was loaded
-    stg_file_md5 VARCHAR(255),             -- MD5 hash of the file for integrity check
-    copy_data_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp when data is copied into the clean layer
-);
+        ORDER_SK NUMBER AUTOINCREMENT PRIMARY KEY COMMENT 'SURROGATE KEY (EDW)',
+        -- AUTO-INCREMENTED PRIMARY KEY
+        ORDER_ID BIGINT UNIQUE COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- PRIMARY KEY INFERRED AS BIGINT
+        CUSTOMER_ID_FK BIGINT COMMENT 'CUSTOMER FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY INFERRED AS BIGINT
+        RESTAURANT_ID_FK BIGINT COMMENT 'RESTAURANT FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY INFERRED AS BIGINT
+        ORDER_DATE TIMESTAMP,
+        -- ORDER DATE INFERRED AS TIMESTAMP
+        TOTAL_AMOUNT DECIMAL(10, 2),
+        -- TOTAL AMOUNT INFERRED AS DECIMAL WITH TWO DECIMAL PLACES
+        STATUS STRING,
+        -- STATUS AS STRING
+        PAYMENT_METHOD STRING,
+        -- PAYMENT METHOD AS STRING
+        CREATED_DT TIMESTAMP_TZ,
+        -- RECORD CREATION DATE
+        MODIFIED_DT TIMESTAMP_TZ,
+        -- LAST MODIFIED DATE, ALLOWS NULL IF NOT MODIFIED
+        -- ADDITIONAL AUDIT COLUMNS
+        STG_FILE_NAME STRING,
+        -- FILE NAME FOR AUDIT
+        STG_FILE_LOAD_TS TIMESTAMP_NTZ,
+        -- FILE LOAD TIMESTAMP FOR AUDIT
+        STG_FILE_MD5 STRING,
+        -- MD5 HASH FOR FILE CONTENT FOR AUDIT
+        COPY_DATA_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP -- TIMESTAMP WHEN DATA IS COPIED, DEFAULTS TO CURRENT TIMESTAMP
+    );
+CREATE OR REPLACE TABLE CLEAN_SCH.ORDER_ITEM (
+        ORDER_ITEM_SK NUMBER AUTOINCREMENT PRIMARY KEY COMMENT 'SURROGATE KEY (EDW)',
+        -- AUTO-INCREMENTED UNIQUE IDENTIFIER FOR EACH ORDER ITEM
+        ORDER_ITEM_ID NUMBER NOT NULL UNIQUE COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        ORDER_ID_FK NUMBER NOT NULL COMMENT 'ORDER FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE FOR ORDER ID
+        MENU_ID_FK NUMBER NOT NULL COMMENT 'MENU FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE FOR MENU ID
+        QUANTITY NUMBER(10, 2),
+        -- QUANTITY AS A DECIMAL NUMBER
+        PRICE NUMBER(10, 2),
+        -- PRICE AS A DECIMAL NUMBER
+        SUBTOTAL NUMBER(10, 2),
+        -- SUBTOTAL AS A DECIMAL NUMBER
+        CREATED_DT TIMESTAMP,
+        -- CREATED DATE OF THE ORDER ITEM
+        MODIFIED_DT TIMESTAMP,
+        -- MODIFIED DATE OF THE ORDER ITEM
+        -- AUDIT COLUMNS
+        STG_FILE_NAME VARCHAR(255),
+        -- FILE NAME OF THE STAGING FILE
+        STG_FILE_LOAD_TS TIMESTAMP,
+        -- TIMESTAMP WHEN THE FILE WAS LOADED
+        STG_FILE_MD5 VARCHAR(255),
+        -- MD5 HASH OF THE FILE FOR INTEGRITY CHECK
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- TIMESTAMP WHEN DATA IS COPIED INTO THE CLEAN LAYER
+    );

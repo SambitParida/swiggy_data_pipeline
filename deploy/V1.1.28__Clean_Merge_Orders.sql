@@ -1,59 +1,59 @@
-use role sysadmin;
+USE ROLE SYSADMIN;
 
-use database sandbox;
+USE DATABASE SANDBOX;
 
-USE WAREHOUSE compute_wh;
+USE WAREHOUSE COMPUTE_WH;
 
-merge into
-    clean_sch.ORDERS as target using (
-        select
-            try_cast(ORDERID as number) as ORDER_ID,
-            try_cast(CUSTOMERID as number) as CUSTOMER_ID_FK,
-            try_cast(RESTAURANTID as number) as RESTAURANT_ID_FK,
-            TRY_TO_TIMESTAMP_NTZ(orderdate, 'YYYY-MM-DD HH24:MI:SS.FF6') as ORDER_DATE,
-            try_cast(TOTALAMOUNT as number(38,3)) as TOTAL_AMOUNT,
-            try_cast(STATUS as STRING) as STATUS,
-            try_cast(PAYMENTMETHOD as string) as PAYMENT_METHOD,
-            TRY_TO_TIMESTAMP_NTZ(CreatedDate, 'YYYY-MM-DD HH24:MI:SS.FF6') as created_dt,
-            TRY_TO_TIMESTAMP_NTZ(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS.FF6') as modified_dt,
-            stg_file_name,
-            stg_file_load_ts,
-            stg_file_md5,
-            current_timestamp as copy_data_ts
-        from
-            stage_sch.ORDERS_STM
-    ) as source on target.ORDER_ID = source.ORDER_ID
-when matched and
+MERGE INTO
+    CLEAN_SCH.ORDERS AS TARGET USING (
+        SELECT
+            TRY_CAST(ORDERID AS NUMBER) AS ORDER_ID,
+            TRY_CAST(CUSTOMERID AS NUMBER) AS CUSTOMER_ID_FK,
+            TRY_CAST(RESTAURANTID AS NUMBER) AS RESTAURANT_ID_FK,
+            TRY_TO_TIMESTAMP_NTZ(ORDERDATE, 'YYYY-MM-DD HH24:MI:SS.FF6') AS ORDER_DATE,
+            TRY_CAST(TOTALAMOUNT AS NUMBER(38,3)) AS TOTAL_AMOUNT,
+            TRY_CAST(STATUS AS STRING) AS STATUS,
+            TRY_CAST(PAYMENTMETHOD AS STRING) AS PAYMENT_METHOD,
+            TRY_TO_TIMESTAMP_NTZ(CREATEDDATE, 'YYYY-MM-DD HH24:MI:SS.FF6') AS CREATED_DT,
+            TRY_TO_TIMESTAMP_NTZ(MODIFIEDDATE, 'YYYY-MM-DD HH24:MI:SS.FF6') AS MODIFIED_DT,
+            STG_FILE_NAME,
+            STG_FILE_LOAD_TS,
+            STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM
+            STAGE_SCH.ORDERS_STM
+    ) AS SOURCE ON TARGET.ORDER_ID = SOURCE.ORDER_ID
+WHEN MATCHED AND
     (
 
-        target.CUSTOMER_ID_FK != source.CUSTOMER_ID_FK or 
-        target.RESTAURANT_ID_FK != source.RESTAURANT_ID_FK OR
-        target.ORDER_DATE != source.ORDER_DATE OR
-        target.TOTAL_AMOUNT != source.TOTAL_AMOUNT OR
-        target.STATUS != source.STATUS OR
-        target.PAYMENT_METHOD != source.PAYMENT_METHOD 
+        TARGET.CUSTOMER_ID_FK != SOURCE.CUSTOMER_ID_FK OR 
+        TARGET.RESTAURANT_ID_FK != SOURCE.RESTAURANT_ID_FK OR
+        TARGET.ORDER_DATE != SOURCE.ORDER_DATE OR
+        TARGET.TOTAL_AMOUNT != SOURCE.TOTAL_AMOUNT OR
+        TARGET.STATUS != SOURCE.STATUS OR
+        TARGET.PAYMENT_METHOD != SOURCE.PAYMENT_METHOD 
 
     )
 
 THEN UPDATE SET
 
-        target.CUSTOMER_ID_FK = source.CUSTOMER_ID_FK,
-        target.RESTAURANT_ID_FK = source.RESTAURANT_ID_FK,
-        target.ORDER_DATE = source.ORDER_DATE,
-        target.TOTAL_AMOUNT = source.TOTAL_AMOUNT,
-        target.STATUS = source.STATUS,
-        target.PAYMENT_METHOD = source.PAYMENT_METHOD,
+        TARGET.CUSTOMER_ID_FK = SOURCE.CUSTOMER_ID_FK,
+        TARGET.RESTAURANT_ID_FK = SOURCE.RESTAURANT_ID_FK,
+        TARGET.ORDER_DATE = SOURCE.ORDER_DATE,
+        TARGET.TOTAL_AMOUNT = SOURCE.TOTAL_AMOUNT,
+        TARGET.STATUS = SOURCE.STATUS,
+        TARGET.PAYMENT_METHOD = SOURCE.PAYMENT_METHOD,
         
-        --Updating Audit Colums--
+        --UPDATING AUDIT COLUMS--
 
-        target.created_dt = source.created_dt,
-        target.modified_dt = source.modified_dt,
-        target.stg_file_name = source.stg_file_name,
-        target.stg_file_load_ts = source.stg_file_load_ts,
-        target.stg_file_md5 = source.stg_file_md5,
-        target.copy_data_ts = source.copy_data_ts
+        TARGET.CREATED_DT = SOURCE.CREATED_DT,
+        TARGET.MODIFIED_DT = SOURCE.MODIFIED_DT,
+        TARGET.STG_FILE_NAME = SOURCE.STG_FILE_NAME,
+        TARGET.STG_FILE_LOAD_TS = SOURCE.STG_FILE_LOAD_TS,
+        TARGET.STG_FILE_MD5 = SOURCE.STG_FILE_MD5,
+        TARGET.COPY_DATA_TS = SOURCE.COPY_DATA_TS
 
-when not matched then insert
+WHEN NOT MATCHED THEN INSERT
     (
       ORDER_ID, 
       CUSTOMER_ID_FK, 

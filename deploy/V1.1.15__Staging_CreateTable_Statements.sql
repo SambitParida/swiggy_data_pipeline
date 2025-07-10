@@ -1,174 +1,250 @@
-use role sysadmin;
-use database sandbox;
-use schema stage_sch;
-USE WAREHOUSE compute_wh;
-
--- create restaurant table under stage location, with all text value + audit column for copy command
-create or replace table stage_sch.restaurant (
-    restaurantid text,      
-    name text ,                                         -- restaurant name, required field
-    cuisinetype text,                                    -- type of cuisine offered
-    pricing_for_2 text,                                  -- pricing for two people as text
-    restaurant_phone text WITH TAG (common.pii_policy_tag = 'SENSITIVE'),                               -- phone number as text
-    operatinghours text,                                 -- restaurant operating hours
-    locationid text ,                                    -- location id, default as text
-    activeflag text ,                                    -- active status
-    openstatus text ,                                    -- open status
-    locality text,                                       -- locality as text
-    restaurant_address text,                             -- address as text
-    latitude text,                                       -- latitude as text for precision
-    longitude text,                                      -- longitude as text for precision
-    createddate text,                                    -- record creation date
-    modifieddate text,                                   -- last modified date
-
-    -- audit columns for debugging
-    stg_file_name text,
-    stg_file_load_ts timestamp,
-    stg_file_md5 text,
-    copy_data_ts timestamp default current_timestamp
-)
-comment = 'This is the restaurant stage/raw table where data will be copied from internal stage using copy command. This is as-is data represetation from the source location. All the columns are text data type except the audit columns that are added for traceability.'
-;
-
--- create restaurant table under stage, with all text value + audit column for copy command
-create or replace table stage_sch.customer (
-    customerid text,                    -- primary key as text
-    name text,                          -- name as text
-    mobile text WITH TAG (common.pii_policy_tag = 'PII'),                        -- mobile number as text
-    email text WITH TAG (common.pii_policy_tag = 'EMAIL'),                         -- email as text
-    loginbyusing text,                  -- login method as text
-    gender text WITH TAG (common.pii_policy_tag = 'PII'),                        -- gender as text
-    dob text WITH TAG (common.pii_policy_tag = 'PII'),                           -- date of birth as text
-    anniversary text,                   -- anniversary as text
-    preferences text,                   -- preferences as text
-    createddate text,                   -- created date as text
-    modifieddate text,                  -- modified date as text
-
-    -- audit columns with appropriate data types
-    stg_file_name text,
-    stg_file_load_ts timestamp,
-    stg_file_md5 text,
-    copy_data_ts timestamp default current_timestamp
-)
-comment = 'This is the customer stage/raw table where data will be copied from internal stage using copy command. This is as-is data represetation from the source location. All the columns are text data type except the audit columns that are added for traceability.';
-
-
-create or replace table stage_sch.customeraddress (
-    addressid text,                    -- primary key as text
-    customerid text comment 'Customer FK (Source Data)',                   -- foreign key reference as text (no constraint in snowflake)
-    flatno text,                       -- flat number as text
-    houseno text,                      -- house number as text
-    floor text,                        -- floor as text
-    building text,                     -- building name as text
-    landmark text,                     -- landmark as text
-    locality text,                     -- locality as text
-    city text,                          -- city as text
-    state text,                         -- state as text
-    pincode text,                       -- pincode as text
-    coordinates text,                  -- coordinates as text
-    primaryflag text,                  -- primary flag as text
-    addresstype text,                  -- address type as text
-    createddate text,                  -- created date as text
-    modifieddate text,                 -- modified date as text
-
-    -- audit columns with appropriate data types
-    stg_file_name text,
-    stg_file_load_ts timestamp,
-    stg_file_md5 text,
-    copy_data_ts timestamp default current_timestamp
-)
-comment = 'This is the customer address stage/raw table where data will be copied from internal stage using copy command. This is as-is data represetation from the source location. All the columns are text data type except the audit columns that are added for traceability.';
-
-
-create or replace table stage_sch.menu (
-    menuid text comment 'Primary Key (Source System)',                   -- primary key as text
-    restaurantid text comment 'Restaurant FK(Source System)',             -- foreign key reference as text (no constraint in snowflake)
-    itemname text,                 -- item name as text
-    description text,              -- description as text
-    price text,                    -- price as text (no decimal constraint)
-    category text,                 -- category as text
-    availability text,             -- availability as text
-    itemtype text,                 -- item type as text
-    createddate text,              -- created date as text
-    modifieddate text,             -- modified date as text
-
-    -- audit columns with appropriate data types
-    stg_file_name text,
-    stg_file_load_ts timestamp,
-    stg_file_md5 text,
-    copy_data_ts timestamp default current_timestamp
-)
-comment = 'This is the menu stage/raw table where data will be copied from internal stage using copy command. This is as-is data represetation from the source location. All the columns are text data type except the audit columns that are added for traceability.';
-
-create or replace table stage_sch.deliveryagent (
-    deliveryagentid text comment 'Primary Key (Source System)',         -- primary key as text
-    name text,           -- name as text, required field
-    phone text,            -- phone as text, unique constraint indicated
-    vehicletype text,             -- vehicle type as text
-    locationid text,              -- foreign key reference as text (no constraint in snowflake)
-    status text,                  -- status as text
-    gender text,                  -- status as text
-    rating text,                  -- rating as text
-    createddate text,             -- created date as text
-    modifieddate text,            -- modified date as text
-
-    -- audit columns with appropriate data types
-    stg_file_name text,
-    stg_file_load_ts timestamp,
-    stg_file_md5 text,
-    copy_data_ts timestamp default current_timestamp
-);
-
-
-create or replace table stage_sch.delivery (
-    deliveryid text comment 'Primary Key (Source System)',                           -- foreign key reference as text (no constraint in snowflake)
-    orderid text comment 'Order FK (Source System)',                           -- foreign key reference as text (no constraint in snowflake)
-    deliveryagentid text comment 'Delivery Agent FK(Source System)',                   -- foreign key reference as text (no constraint in snowflake)
-    deliverystatus text,                    -- delivery status as text
-    estimatedtime text,                     -- estimated time as text
-    addressid text comment 'Customer Address FK(Source System)',                         -- foreign key reference as text (no constraint in snowflake)
-    deliverydate text,                      -- delivery date as text
-    createddate text,                       -- created date as text
-    modifieddate text,                      -- modified date as text
-
-    -- audit columns with appropriate data types
-    stg_file_name text,
-    stg_file_load_ts timestamp,
-    stg_file_md5 text,
-    copy_data_ts timestamp default current_timestamp
-);
-
-create or replace table stage_sch.orders (
-    orderid text comment 'Primary Key (Source System)',                  -- primary key as text
-    customerid text comment 'Customer FK(Source System)',               -- foreign key reference as text (no constraint in snowflake)
-    restaurantid text comment 'Restaurant FK(Source System)',             -- foreign key reference as text (no constraint in snowflake)
-    orderdate text,                -- order date as text
-    totalamount text,              -- total amount as text (no decimal constraint)
-    status text,                   -- status as text
-    paymentmethod text,            -- payment method as text
-    createddate text,              -- created date as text
-    modifieddate text,             -- modified date as text
-
-    -- audit columns with appropriate data types
-    stg_file_name text,
-    stg_file_load_ts timestamp,
-    stg_file_md5 text,
-    copy_data_ts timestamp default current_timestamp
-);
-
-create or replace table stage_sch.orderitem (
-    orderitemid text comment 'Primary Key (Source System)',              -- primary key as text
-    orderid text comment 'Order FK(Source System)',                  -- foreign key reference as text (no constraint in snowflake)
-    menuid text comment 'Menu FK(Source System)',                   -- foreign key reference as text (no constraint in snowflake)
-    quantity text,                 -- quantity as text
-    price text,                    -- price as text (no decimal constraint)
-    subtotal text,                 -- subtotal as text (no decimal constraint)
-    createddate text,              -- created date as text
-    modifieddate text,             -- modified date as text
-
-    -- audit columns with appropriate data types
-    stg_file_name text,
-    stg_file_load_ts timestamp,
-    stg_file_md5 text,
-    copy_data_ts timestamp default current_timestamp
-);
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE SCHEMA STAGE_SCH;
+USE WAREHOUSE COMPUTE_WH;
+CREATE OR REPLACE TABLE STAGE_SCH.LOCATION(
+        LOCATIONID TEXT,
+        CITY TEXT,
+        STATE TEXT,
+        ZIPCODE TEXT,
+        ACTIVEFLAG TEXT,
+        CREATEDDATE TEXT,
+        MODIFIEDDATE TEXT,
+        STG_FILE_NAME TEXT,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 TEXT,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+-- CREATE RESTAURANT TABLE UNDER STAGE LOCATION, WITH ALL TEXT VALUE + AUDIT COLUMN FOR COPY COMMAND
+CREATE OR REPLACE TABLE STAGE_SCH.RESTAURANT (
+        RESTAURANTID TEXT,
+        NAME TEXT,
+        -- RESTAURANT NAME, REQUIRED FIELD
+        CUISINETYPE TEXT,
+        -- TYPE OF CUISINE OFFERED
+        PRICING_FOR_2 TEXT,
+        -- PRICING FOR TWO PEOPLE AS TEXT
+        RESTAURANT_PHONE TEXT WITH TAG (COMMON.PII_POLICY_TAG = 'SENSITIVE'),
+        -- PHONE NUMBER AS TEXT
+        OPERATINGHOURS TEXT,
+        -- RESTAURANT OPERATING HOURS
+        LOCATIONID TEXT,
+        -- LOCATION ID, DEFAULT AS TEXT
+        ACTIVEFLAG TEXT,
+        -- ACTIVE STATUS
+        OPENSTATUS TEXT,
+        -- OPEN STATUS
+        LOCALITY TEXT,
+        -- LOCALITY AS TEXT
+        RESTAURANT_ADDRESS TEXT,
+        -- ADDRESS AS TEXT
+        LATITUDE TEXT,
+        -- LATITUDE AS TEXT FOR PRECISION
+        LONGITUDE TEXT,
+        -- LONGITUDE AS TEXT FOR PRECISION
+        CREATEDDATE TEXT,
+        -- RECORD CREATION DATE
+        MODIFIEDDATE TEXT,
+        -- LAST MODIFIED DATE
+        -- AUDIT COLUMNS FOR DEBUGGING
+        STG_FILE_NAME TEXT,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 TEXT,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) COMMENT = 'THIS IS THE RESTAURANT STAGE/RAW TABLE WHERE DATA WILL BE COPIED FROM INTERNAL STAGE USING COPY COMMAND. THIS IS AS-IS DATA REPRESETATION FROM THE SOURCE LOCATION. ALL THE COLUMNS ARE TEXT DATA TYPE EXCEPT THE AUDIT COLUMNS THAT ARE ADDED FOR TRACEABILITY.';
+-- CREATE RESTAURANT TABLE UNDER STAGE, WITH ALL TEXT VALUE + AUDIT COLUMN FOR COPY COMMAND
+CREATE OR REPLACE TABLE STAGE_SCH.CUSTOMER (
+        CUSTOMERID TEXT,
+        -- PRIMARY KEY AS TEXT
+        NAME TEXT,
+        -- NAME AS TEXT
+        MOBILE TEXT WITH TAG (COMMON.PII_POLICY_TAG = 'PII'),
+        -- MOBILE NUMBER AS TEXT
+        EMAIL TEXT WITH TAG (COMMON.PII_POLICY_TAG = 'EMAIL'),
+        -- EMAIL AS TEXT
+        LOGINBYUSING TEXT,
+        -- LOGIN METHOD AS TEXT
+        GENDER TEXT WITH TAG (COMMON.PII_POLICY_TAG = 'PII'),
+        -- GENDER AS TEXT
+        DOB TEXT WITH TAG (COMMON.PII_POLICY_TAG = 'PII'),
+        -- DATE OF BIRTH AS TEXT
+        ANNIVERSARY TEXT,
+        -- ANNIVERSARY AS TEXT
+        PREFERENCES TEXT,
+        -- PREFERENCES AS TEXT
+        CREATEDDATE TEXT,
+        -- CREATED DATE AS TEXT
+        MODIFIEDDATE TEXT,
+        -- MODIFIED DATE AS TEXT
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME TEXT,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 TEXT,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) COMMENT = 'THIS IS THE CUSTOMER STAGE/RAW TABLE WHERE DATA WILL BE COPIED FROM INTERNAL STAGE USING COPY COMMAND. THIS IS AS-IS DATA REPRESETATION FROM THE SOURCE LOCATION. ALL THE COLUMNS ARE TEXT DATA TYPE EXCEPT THE AUDIT COLUMNS THAT ARE ADDED FOR TRACEABILITY.';
+CREATE OR REPLACE TABLE STAGE_SCH.CUSTOMERADDRESS (
+        ADDRESSID TEXT,
+        -- PRIMARY KEY AS TEXT
+        CUSTOMERID TEXT COMMENT 'CUSTOMER FK (SOURCE DATA)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        FLATNO TEXT,
+        -- FLAT NUMBER AS TEXT
+        HOUSENO TEXT,
+        -- HOUSE NUMBER AS TEXT
+        FLOOR TEXT,
+        -- FLOOR AS TEXT
+        BUILDING TEXT,
+        -- BUILDING NAME AS TEXT
+        LANDMARK TEXT,
+        -- LANDMARK AS TEXT
+        LOCALITY TEXT,
+        -- LOCALITY AS TEXT
+        CITY TEXT,
+        -- CITY AS TEXT
+        STATE TEXT,
+        -- STATE AS TEXT
+        PINCODE TEXT,
+        -- PINCODE AS TEXT
+        COORDINATES TEXT,
+        -- COORDINATES AS TEXT
+        PRIMARYFLAG TEXT,
+        -- PRIMARY FLAG AS TEXT
+        ADDRESSTYPE TEXT,
+        -- ADDRESS TYPE AS TEXT
+        CREATEDDATE TEXT,
+        -- CREATED DATE AS TEXT
+        MODIFIEDDATE TEXT,
+        -- MODIFIED DATE AS TEXT
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME TEXT,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 TEXT,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) COMMENT = 'THIS IS THE CUSTOMER ADDRESS STAGE/RAW TABLE WHERE DATA WILL BE COPIED FROM INTERNAL STAGE USING COPY COMMAND. THIS IS AS-IS DATA REPRESETATION FROM THE SOURCE LOCATION. ALL THE COLUMNS ARE TEXT DATA TYPE EXCEPT THE AUDIT COLUMNS THAT ARE ADDED FOR TRACEABILITY.';
+CREATE OR REPLACE TABLE STAGE_SCH.MENU (
+        MENUID TEXT COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- PRIMARY KEY AS TEXT
+        RESTAURANTID TEXT COMMENT 'RESTAURANT FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        ITEMNAME TEXT,
+        -- ITEM NAME AS TEXT
+        DESCRIPTION TEXT,
+        -- DESCRIPTION AS TEXT
+        PRICE TEXT,
+        -- PRICE AS TEXT (NO DECIMAL CONSTRAINT)
+        CATEGORY TEXT,
+        -- CATEGORY AS TEXT
+        AVAILABILITY TEXT,
+        -- AVAILABILITY AS TEXT
+        ITEMTYPE TEXT,
+        -- ITEM TYPE AS TEXT
+        CREATEDDATE TEXT,
+        -- CREATED DATE AS TEXT
+        MODIFIEDDATE TEXT,
+        -- MODIFIED DATE AS TEXT
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME TEXT,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 TEXT,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) COMMENT = 'THIS IS THE MENU STAGE/RAW TABLE WHERE DATA WILL BE COPIED FROM INTERNAL STAGE USING COPY COMMAND. THIS IS AS-IS DATA REPRESETATION FROM THE SOURCE LOCATION. ALL THE COLUMNS ARE TEXT DATA TYPE EXCEPT THE AUDIT COLUMNS THAT ARE ADDED FOR TRACEABILITY.';
+CREATE OR REPLACE TABLE STAGE_SCH.DELIVERYAGENT (
+        DELIVERYAGENTID TEXT COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- PRIMARY KEY AS TEXT
+        NAME TEXT,
+        -- NAME AS TEXT, REQUIRED FIELD
+        PHONE TEXT,
+        -- PHONE AS TEXT, UNIQUE CONSTRAINT INDICATED
+        VEHICLETYPE TEXT,
+        -- VEHICLE TYPE AS TEXT
+        LOCATIONID TEXT,
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        STATUS TEXT,
+        -- STATUS AS TEXT
+        GENDER TEXT,
+        -- STATUS AS TEXT
+        RATING TEXT,
+        -- RATING AS TEXT
+        CREATEDDATE TEXT,
+        -- CREATED DATE AS TEXT
+        MODIFIEDDATE TEXT,
+        -- MODIFIED DATE AS TEXT
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME TEXT,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 TEXT,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+CREATE OR REPLACE TABLE STAGE_SCH.DELIVERY (
+        DELIVERYID TEXT COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        ORDERID TEXT COMMENT 'ORDER FK (SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        DELIVERYAGENTID TEXT COMMENT 'DELIVERY AGENT FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        DELIVERYSTATUS TEXT,
+        -- DELIVERY STATUS AS TEXT
+        ESTIMATEDTIME TEXT,
+        -- ESTIMATED TIME AS TEXT
+        ADDRESSID TEXT COMMENT 'CUSTOMER ADDRESS FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        DELIVERYDATE TEXT,
+        -- DELIVERY DATE AS TEXT
+        CREATEDDATE TEXT,
+        -- CREATED DATE AS TEXT
+        MODIFIEDDATE TEXT,
+        -- MODIFIED DATE AS TEXT
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME TEXT,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 TEXT,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+CREATE OR REPLACE TABLE STAGE_SCH.ORDERS (
+        ORDERID TEXT COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- PRIMARY KEY AS TEXT
+        CUSTOMERID TEXT COMMENT 'CUSTOMER FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        RESTAURANTID TEXT COMMENT 'RESTAURANT FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        ORDERDATE TEXT,
+        -- ORDER DATE AS TEXT
+        TOTALAMOUNT TEXT,
+        -- TOTAL AMOUNT AS TEXT (NO DECIMAL CONSTRAINT)
+        STATUS TEXT,
+        -- STATUS AS TEXT
+        PAYMENTMETHOD TEXT,
+        -- PAYMENT METHOD AS TEXT
+        CREATEDDATE TEXT,
+        -- CREATED DATE AS TEXT
+        MODIFIEDDATE TEXT,
+        -- MODIFIED DATE AS TEXT
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME TEXT,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 TEXT,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+CREATE OR REPLACE TABLE STAGE_SCH.ORDERITEM (
+        ORDERITEMID TEXT COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- PRIMARY KEY AS TEXT
+        ORDERID TEXT COMMENT 'ORDER FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        MENUID TEXT COMMENT 'MENU FK(SOURCE SYSTEM)',
+        -- FOREIGN KEY REFERENCE AS TEXT (NO CONSTRAINT IN SNOWFLAKE)
+        QUANTITY TEXT,
+        -- QUANTITY AS TEXT
+        PRICE TEXT,
+        -- PRICE AS TEXT (NO DECIMAL CONSTRAINT)
+        SUBTOTAL TEXT,
+        -- SUBTOTAL AS TEXT (NO DECIMAL CONSTRAINT)
+        CREATEDDATE TEXT,
+        -- CREATED DATE AS TEXT
+        MODIFIEDDATE TEXT,
+        -- MODIFIED DATE AS TEXT
+        -- AUDIT COLUMNS WITH APPROPRIATE DATA TYPES
+        STG_FILE_NAME TEXT,
+        STG_FILE_LOAD_TS TIMESTAMP,
+        STG_FILE_MD5 TEXT,
+        COPY_DATA_TS TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );

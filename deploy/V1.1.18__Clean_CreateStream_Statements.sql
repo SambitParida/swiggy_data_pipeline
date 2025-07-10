@@ -1,38 +1,14 @@
-use role sysadmin;
-use database sandbox;
-use schema stage_sch;
-USE WAREHOUSE compute_wh;
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE SCHEMA CLEAN_SCH;
+USE WAREHOUSE COMPUTE_WH;
 
---- Stream object to capture the changes in clean_sch.restaurant table. 
-create or replace stream clean_sch.restaurant_stm 
-on table clean_sch.restaurant
-comment = 'This is a standard stream object on the clean restaurant table to track insert, update, and delete changes';
-
-create or replace stream clean_sch.customer_stm 
-on table clean_sch.customer
-comment = 'This is a standard stream object on the clean customer table to track insert, update, and delete changes';
-
-create or replace stream clean_sch.customeraddress_stm 
-on table clean_sch.customer_address
-comment = 'This is a standard stream object on the clean customeraddress table to track insert, update, and delete changes';
-
-create or replace stream clean_sch.menu_stm 
-on table clean_sch.menu
-comment = 'This is a standard stream object on the clean menu table to track insert, update, and delete changes';
-
-create or replace stream clean_sch.deliveryagent_stm 
-on table clean_sch.delivery_agent
-comment = 'This is a standard stream object on the clean deliveryagent table to track insert, update, and delete changes';
-
-create or replace stream clean_sch.delivery_stm 
-on table clean_sch.delivery
-comment = 'This is a standard stream object on the clean delivery table to track insert, update, and delete changes';
-
-create or replace stream clean_sch.orders_stm 
-on table clean_sch.orders
-comment = 'This is a standard stream object on the clean orders table to track insert, update, and delete changes';
-
-create or replace stream clean_sch.orderitem_stm 
-on table clean_sch.order_item
-comment = 'This is a standard stream object on the clean orderitem table to track insert, update, and delete changes';
-
+CREATE OR REPLACE STREAM CLEAN_SCH.RESTAURANT_LOCATION_STM ON TABLE CLEAN_SCH.RESTAURANT_LOCATION COMMENT = 'THIS IS THE STANDARD STREAM OBJECT ON RESTAURANT_LOCATION TABLE TO TRACK INSERTS, UPDATES AND DELETES';
+CREATE OR REPLACE STREAM CLEAN_SCH.RESTAURANT_STM ON TABLE CLEAN_SCH.RESTAURANT COMMENT = 'THIS IS A STANDARD STREAM OBJECT ON THE CLEAN RESTAURANT TABLE TO TRACK INSERT, UPDATE, AND DELETE CHANGES';
+CREATE OR REPLACE STREAM CLEAN_SCH.CUSTOMER_STM ON TABLE CLEAN_SCH.CUSTOMER COMMENT = 'THIS IS A STANDARD STREAM OBJECT ON THE CLEAN CUSTOMER TABLE TO TRACK INSERT, UPDATE, AND DELETE CHANGES';
+CREATE OR REPLACE STREAM CLEAN_SCH.CUSTOMERADDRESS_STM ON TABLE CLEAN_SCH.CUSTOMER_ADDRESS COMMENT = 'THIS IS A STANDARD STREAM OBJECT ON THE CLEAN CUSTOMERADDRESS TABLE TO TRACK INSERT, UPDATE, AND DELETE CHANGES';
+CREATE OR REPLACE STREAM CLEAN_SCH.MENU_STM ON TABLE CLEAN_SCH.MENU COMMENT = 'THIS IS A STANDARD STREAM OBJECT ON THE CLEAN MENU TABLE TO TRACK INSERT, UPDATE, AND DELETE CHANGES';
+CREATE OR REPLACE STREAM CLEAN_SCH.DELIVERYAGENT_STM ON TABLE CLEAN_SCH.DELIVERY_AGENT COMMENT = 'THIS IS A STANDARD STREAM OBJECT ON THE CLEAN DELIVERYAGENT TABLE TO TRACK INSERT, UPDATE, AND DELETE CHANGES';
+CREATE OR REPLACE STREAM CLEAN_SCH.DELIVERY_STM ON TABLE CLEAN_SCH.DELIVERY COMMENT = 'THIS IS A STANDARD STREAM OBJECT ON THE CLEAN DELIVERY TABLE TO TRACK INSERT, UPDATE, AND DELETE CHANGES';
+CREATE OR REPLACE STREAM CLEAN_SCH.ORDERS_STM ON TABLE CLEAN_SCH.ORDERS COMMENT = 'THIS IS A STANDARD STREAM OBJECT ON THE CLEAN ORDERS TABLE TO TRACK INSERT, UPDATE, AND DELETE CHANGES';
+CREATE OR REPLACE STREAM CLEAN_SCH.ORDERITEM_STM ON TABLE CLEAN_SCH.ORDER_ITEM COMMENT = 'THIS IS A STANDARD STREAM OBJECT ON THE CLEAN ORDERITEM TABLE TO TRACK INSERT, UPDATE, AND DELETE CHANGES';

@@ -1,22 +1,30 @@
-use role sysadmin;
-use database sandbox;
-USE WAREHOUSE compute_wh;
-
-copy into stage_sch.location (locationid, city, state,zipcode, activeflag,createddate,modifieddate,stg_file_name,stg_file_load_ts,stg_file_md5,copy_data_ts)
-from (
-select 
-    t.$1::text as locationid,
-    t.$2::text as city,
-    t.$3::text as state,
-    t.$4::text as zipcode,
-    t.$5::text as activeflag,
-    t.$6::text as createddate,
-    t.$7::text as modifieddate,
-    metadata$filename as stg_file_name,
-    metadata$file_last_modified as stg_file_load_ts,
-    metadata$file_content_key as stg_file_md5,
-    current_timestamp as copy_data_ts    
- from @stage_sch.csv_stg/initial/location t)
- file_format = (format_name = 'stage_sch.csv_file_format') 
-on_error = abort_statement;
-
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+COPY INTO STAGE_SCH.LOCATION (
+    LOCATIONID,
+    CITY,
+    STATE,
+    ZIPCODE,
+    ACTIVEFLAG,
+    CREATEDDATE,
+    MODIFIEDDATE,
+    STG_FILE_NAME,
+    STG_FILE_LOAD_TS,
+    STG_FILE_MD5,
+    COPY_DATA_TS
+)
+FROM (
+        SELECT T.$1::TEXT AS LOCATIONID,
+            T.$2::TEXT AS CITY,
+            T.$3::TEXT AS STATE,
+            T.$4::TEXT AS ZIPCODE,
+            T.$5::TEXT AS ACTIVEFLAG,
+            T.$6::TEXT AS CREATEDDATE,
+            T.$7::TEXT AS MODIFIEDDATE,
+            METADATA $FILENAME AS STG_FILE_NAME,
+            METADATA $FILE_LAST_MODIFIED AS STG_FILE_LOAD_TS,
+            METADATA $FILE_CONTENT_KEY AS STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM @STAGE_SCH.CSV_STG / INITIAL / LOCATION T
+    ) FILE_FORMAT = (FORMAT_NAME = 'STAGE_SCH.CSV_FILE_FORMAT') ON_ERROR = ABORT_STATEMENT;

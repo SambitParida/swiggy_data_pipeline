@@ -1,23 +1,10 @@
-use role sysadmin;
-use database sandbox;
-USE WAREHOUSE compute_wh;
-
-create or replace tag 
-    common.pii_policy_tag 
-    allowed_values 'PII','PRICE','SENSITIVE','EMAIL'
-    comment = 'This is PII policy tag object';
-
-create or replace masking policy 
-    common.pii_masking_policy as (pii_text string)
-    returns string -> 
-    to_varchar('** PII **');
-
-create or replace masking policy 
-    common.email_masking_policy as (email_text string)
-    returns string -> 
-    to_varchar('** EAMIL **');
-
-create or replace masking policy 
-    common.phone_masking_policy as (phone string)
-    returns string -> 
-    to_varchar('** Phone **');
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+CREATE OR REPLACE TAG COMMON.PII_POLICY_TAG ALLOWED_VALUES 'PII',
+    'PRICE',
+    'SENSITIVE',
+    'EMAIL' COMMENT = 'THIS IS PII POLICY TAG OBJECT';
+CREATE OR REPLACE MASKING POLICY COMMON.PII_MASKING_POLICY AS (PII_TEXT STRING) RETURNS STRING->TO_VARCHAR('** PII **');
+CREATE OR REPLACE MASKING POLICY COMMON.EMAIL_MASKING_POLICY AS (EMAIL_TEXT STRING) RETURNS STRING->TO_VARCHAR('** EAMIL **');
+CREATE OR REPLACE MASKING POLICY COMMON.PHONE_MASKING_POLICY AS (PHONE STRING) RETURNS STRING->TO_VARCHAR('** PHONE **');

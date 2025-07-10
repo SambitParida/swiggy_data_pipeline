@@ -1,59 +1,52 @@
-use role sysadmin;
-use database sandbox;
-USE WAREHOUSE compute_wh;
-
-merge into clean_sch.customer as target
-using
-(
-    select
-    try_cast(customerid as number) as CUSTOMER_ID,
-    try_cast(name as string) as name,
-    try_cast(mobile as string) as MOBILE,
-    try_cast(email as string) as EMAIL,
-    try_cast(LOGINBYUSING as string) as LOGIN_BY_USING,
-    try_cast(GENDER as string) as GENDER,
-    try_to_date(DOB, 'YYYY-MM-DD') as DOB,
-    try_to_date(ANNIVERSARY, 'YYYY-MM-DD') as ANNIVERSARY,
-    try_cast(PREFERENCES as string) as PREFERENCES,
-    TRY_TO_TIMESTAMP_TZ(CreatedDate, 'YYYY-MM-DD"T"HH24:MI:SS.FF6') as created_dt,
-    TRY_TO_TIMESTAMP_TZ(ModifiedDate, 'YYYY-MM-DD"T"HH24:MI:SS.FF6') as modified_dt,
-    stg_file_name,
-    stg_file_load_ts,
-    stg_file_md5,
-    current_timestamp as copy_data_ts
-    from stage_sch.customer_stm
-) as source 
-on target.CUSTOMER_ID = source.CUSTOMER_ID
-when matched and 
-(       
-        target.name != source.name or
-        target.mobile != source.mobile or
-        target.EMAIL != source.EMAIL or
-        target.LOGIN_BY_USING != source.LOGIN_BY_USING or
-        target.GENDER != source.GENDER or
-        target.DOB != source.DOB or
-        target.ANNIVERSARY != source.ANNIVERSARY or
-        target.PREFERENCES != source.PREFERENCES 
-
-)
- THEN 
-    UPDATE SET 
-        target.name = source.name,
-        target.mobile = source.mobile,
-        target.EMAIL = source.EMAIL,
-        target.LOGIN_BY_USING = source.LOGIN_BY_USING,
-        target.GENDER = source.GENDER,
-        target.DOB = source.DOB,
-        target.ANNIVERSARY = source.ANNIVERSARY,
-        target.PREFERENCES = source.PREFERENCES, 
-        target.created_dt = source.created_dt,
-        target.modified_dt = source.modified_dt,
-        target.stg_file_name = source.stg_file_name,
-        target.stg_file_load_ts = source.stg_file_load_ts,
-        target.stg_file_md5 = source.stg_file_md5,
-        target.copy_data_ts = source.copy_data_ts
-when not matched then
-    insert (
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+MERGE INTO CLEAN_SCH.CUSTOMER AS TARGET USING (
+    SELECT TRY_CAST(CUSTOMERID AS NUMBER) AS CUSTOMER_ID,
+        TRY_CAST(NAME AS STRING) AS NAME,
+        TRY_CAST(MOBILE AS STRING) AS MOBILE,
+        TRY_CAST(EMAIL AS STRING) AS EMAIL,
+        TRY_CAST(LOGINBYUSING AS STRING) AS LOGIN_BY_USING,
+        TRY_CAST(GENDER AS STRING) AS GENDER,
+        TRY_TO_DATE(DOB, 'YYYY-MM-DD') AS DOB,
+        TRY_TO_DATE(ANNIVERSARY, 'YYYY-MM-DD') AS ANNIVERSARY,
+        TRY_CAST(PREFERENCES AS STRING) AS PREFERENCES,
+        TRY_TO_TIMESTAMP_TZ(CREATEDDATE, 'YYYY-MM-DD"T"HH24:MI:SS.FF6') AS CREATED_DT,
+        TRY_TO_TIMESTAMP_TZ(MODIFIEDDATE, 'YYYY-MM-DD"T"HH24:MI:SS.FF6') AS MODIFIED_DT,
+        STG_FILE_NAME,
+        STG_FILE_LOAD_TS,
+        STG_FILE_MD5,
+        CURRENT_TIMESTAMP AS COPY_DATA_TS
+    FROM STAGE_SCH.CUSTOMER_STM
+) AS SOURCE ON TARGET.CUSTOMER_ID = SOURCE.CUSTOMER_ID
+WHEN MATCHED
+AND (
+    TARGET.NAME != SOURCE.NAME
+    OR TARGET.MOBILE != SOURCE.MOBILE
+    OR TARGET.EMAIL != SOURCE.EMAIL
+    OR TARGET.LOGIN_BY_USING != SOURCE.LOGIN_BY_USING
+    OR TARGET.GENDER != SOURCE.GENDER
+    OR TARGET.DOB != SOURCE.DOB
+    OR TARGET.ANNIVERSARY != SOURCE.ANNIVERSARY
+    OR TARGET.PREFERENCES != SOURCE.PREFERENCES
+) THEN
+UPDATE
+SET TARGET.NAME = SOURCE.NAME,
+    TARGET.MOBILE = SOURCE.MOBILE,
+    TARGET.EMAIL = SOURCE.EMAIL,
+    TARGET.LOGIN_BY_USING = SOURCE.LOGIN_BY_USING,
+    TARGET.GENDER = SOURCE.GENDER,
+    TARGET.DOB = SOURCE.DOB,
+    TARGET.ANNIVERSARY = SOURCE.ANNIVERSARY,
+    TARGET.PREFERENCES = SOURCE.PREFERENCES,
+    TARGET.CREATED_DT = SOURCE.CREATED_DT,
+    TARGET.MODIFIED_DT = SOURCE.MODIFIED_DT,
+    TARGET.STG_FILE_NAME = SOURCE.STG_FILE_NAME,
+    TARGET.STG_FILE_LOAD_TS = SOURCE.STG_FILE_LOAD_TS,
+    TARGET.STG_FILE_MD5 = SOURCE.STG_FILE_MD5,
+    TARGET.COPY_DATA_TS = SOURCE.COPY_DATA_TS
+    WHEN NOT MATCHED THEN
+INSERT (
         CUSTOMER_ID,
         NAME,
         EMAIL,
@@ -62,26 +55,26 @@ when not matched then
         DOB,
         ANNIVERSARY,
         PREFERENCES,
-        created_dt,
-        modified_dt,
-        stg_file_name,
-        stg_file_load_ts,
-        stg_file_md5,
-        copy_data_ts
+        CREATED_DT,
+        MODIFIED_DT,
+        STG_FILE_NAME,
+        STG_FILE_LOAD_TS,
+        STG_FILE_MD5,
+        COPY_DATA_TS
     )
-    VALUES (
-        source.CUSTOMER_ID,
-        source.NAME,
-        source.EMAIL,
-        source.LOGIN_BY_USING,
-        source.GENDER,
-        source.DOB,
-        source.ANNIVERSARY,
-        source.PREFERENCES,
-        source.created_dt,
-        source.modified_dt,
-        source.stg_file_name,
-        source.stg_file_load_ts,
-        source.stg_file_md5,
-        source.copy_data_ts
+VALUES (
+        SOURCE.CUSTOMER_ID,
+        SOURCE.NAME,
+        SOURCE.EMAIL,
+        SOURCE.LOGIN_BY_USING,
+        SOURCE.GENDER,
+        SOURCE.DOB,
+        SOURCE.ANNIVERSARY,
+        SOURCE.PREFERENCES,
+        SOURCE.CREATED_DT,
+        SOURCE.MODIFIED_DT,
+        SOURCE.STG_FILE_NAME,
+        SOURCE.STG_FILE_LOAD_TS,
+        SOURCE.STG_FILE_MD5,
+        SOURCE.COPY_DATA_TS
     );

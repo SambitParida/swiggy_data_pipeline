@@ -1,109 +1,103 @@
-use role sysadmin;
-use database sandbox;
-USE WAREHOUSE compute_wh;
-
-merge into clean_sch.restaurant as target
-using
-(
-    select
-    try_cast(restaurantid as number) as restaurant_id,
-    try_cast(name as string) as name,
-    try_cast(cuisinetype as string) as CUISINE_TYPE,
-    try_cast(pricing_for_2 as number(10,2)) as PRICING_FOR_TWO,
-    try_cast(RESTAURANT_PHONE as string) as RESTAURANT_PHONE,
-    try_cast(OPERATINGHOURS as string) as OPERATING_HOURS,
-    try_cast(locationid as string) as LOCATION_ID_FK,
-    try_cast(ActiveFlag as String) as Active_Flag,
-    try_cast(OPENSTATUS as string) as OPEN_STATUS,
-    try_cast(LOCALITY as string) as LOCALITY,
-    try_cast(RESTAURANT_ADDRESS as string) as RESTAURANT_ADDRESS,
-    try_cast(LATITUDE as number(9,6)) as LATITUDE,
-    try_cast(LONGITUDE as number(9,6)) as LONGITUDE,
-    TO_TIMESTAMP_TZ(CreatedDate, 'YYYY-MM-DD HH24:MI:SS.FF9') as created_dt,
-    TO_TIMESTAMP_TZ(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS.FF9') as modified_dt,
-    stg_file_name,
-    stg_file_load_ts,
-    stg_file_md5,
-    current_timestamp as copy_data_ts
-    from stage_sch.restaurant_stm
-) as source 
-on target.restaurant_id = source.restaurant_id
-when matched and 
-(       
-        target.name != source.name or
-        target.CUISINE_TYPE != source.CUISINE_TYPE or
-        target.PRICING_FOR_TWO != source.PRICING_FOR_TWO or
-        target.RESTAURANT_PHONE != source.RESTAURANT_PHONE or
-        target.OPERATING_HOURS != source.OPERATING_HOURS or
-        target.LOCATION_ID_FK != source.LOCATION_ID_FK or
-        target.LATITUDE != source.LATITUDE or
-        target.Active_Flag != source.Active_Flag or
-        target.OPEN_STATUS != source.OPEN_STATUS or
-        target.LOCALITY != source.LOCALITY or
-        target.RESTAURANT_ADDRESS != source.RESTAURANT_ADDRESS or
-        target.LATITUDE != source.LATITUDE or
-        target.LONGITUDE != source.LONGITUDE
-)
- THEN 
-    UPDATE SET 
-        target.name = source.name,
-        target.CUISINE_TYPE = source.CUISINE_TYPE,
-        target.PRICING_FOR_TWO = source.PRICING_FOR_TWO,
-        target.RESTAURANT_PHONE = source.RESTAURANT_PHONE,
-        target.OPERATING_HOURS = source.OPERATING_HOURS,
-        target.LOCATION_ID_FK = source.LOCATION_ID_FK,
-        target.Active_Flag = source.Active_Flag,
-        target.OPEN_STATUS = source.OPEN_STATUS,
-        target.LOCALITY = source.LOCALITY,
-        target.RESTAURANT_ADDRESS = source.RESTAURANT_ADDRESS,
-        target.LATITUDE = source.LATITUDE,
-        target.LONGITUDE = source.LONGITUDE,
-        target.created_dt = source.created_dt,
-        target.modified_dt = source.modified_dt,
-        target.stg_file_name = source.stg_file_name,
-        target.stg_file_load_ts = source.stg_file_load_ts,
-        target.stg_file_md5 = source.stg_file_md5,
-        target.copy_data_ts = source.copy_data_ts
-when not matched then
-    insert (
-        restaurant_id,
-        name,
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+MERGE INTO CLEAN_SCH.RESTAURANT AS TARGET USING (
+    SELECT TRY_CAST(RESTAURANTID AS NUMBER) AS RESTAURANT_ID,
+        TRY_CAST(NAME AS STRING) AS NAME,
+        TRY_CAST(CUISINETYPE AS STRING) AS CUISINE_TYPE,
+        TRY_CAST(PRICING_FOR_2 AS NUMBER(10, 2)) AS PRICING_FOR_TWO,
+        TRY_CAST(RESTAURANT_PHONE AS STRING) AS RESTAURANT_PHONE,
+        TRY_CAST(OPERATINGHOURS AS STRING) AS OPERATING_HOURS,
+        TRY_CAST(LOCATIONID AS STRING) AS LOCATION_ID_FK,
+        TRY_CAST(ACTIVEFLAG AS STRING) AS ACTIVE_FLAG,
+        TRY_CAST(OPENSTATUS AS STRING) AS OPEN_STATUS,
+        TRY_CAST(LOCALITY AS STRING) AS LOCALITY,
+        TRY_CAST(RESTAURANT_ADDRESS AS STRING) AS RESTAURANT_ADDRESS,
+        TRY_CAST(LATITUDE AS NUMBER(9, 6)) AS LATITUDE,
+        TRY_CAST(LONGITUDE AS NUMBER(9, 6)) AS LONGITUDE,
+        TO_TIMESTAMP_TZ(CREATEDDATE, 'YYYY-MM-DD HH24:MI:SS.FF9') AS CREATED_DT,
+        TO_TIMESTAMP_TZ(MODIFIEDDATE, 'YYYY-MM-DD HH24:MI:SS.FF9') AS MODIFIED_DT,
+        STG_FILE_NAME,
+        STG_FILE_LOAD_TS,
+        STG_FILE_MD5,
+        CURRENT_TIMESTAMP AS COPY_DATA_TS
+    FROM STAGE_SCH.RESTAURANT_STM
+) AS SOURCE ON TARGET.RESTAURANT_ID = SOURCE.RESTAURANT_ID
+WHEN MATCHED
+AND (
+    TARGET.NAME != SOURCE.NAME
+    OR TARGET.CUISINE_TYPE != SOURCE.CUISINE_TYPE
+    OR TARGET.PRICING_FOR_TWO != SOURCE.PRICING_FOR_TWO
+    OR TARGET.RESTAURANT_PHONE != SOURCE.RESTAURANT_PHONE
+    OR TARGET.OPERATING_HOURS != SOURCE.OPERATING_HOURS
+    OR TARGET.LOCATION_ID_FK != SOURCE.LOCATION_ID_FK
+    OR TARGET.LATITUDE != SOURCE.LATITUDE
+    OR TARGET.ACTIVE_FLAG != SOURCE.ACTIVE_FLAG
+    OR TARGET.OPEN_STATUS != SOURCE.OPEN_STATUS
+    OR TARGET.LOCALITY != SOURCE.LOCALITY
+    OR TARGET.RESTAURANT_ADDRESS != SOURCE.RESTAURANT_ADDRESS
+    OR TARGET.LATITUDE != SOURCE.LATITUDE
+    OR TARGET.LONGITUDE != SOURCE.LONGITUDE
+) THEN
+UPDATE
+SET TARGET.NAME = SOURCE.NAME,
+    TARGET.CUISINE_TYPE = SOURCE.CUISINE_TYPE,
+    TARGET.PRICING_FOR_TWO = SOURCE.PRICING_FOR_TWO,
+    TARGET.RESTAURANT_PHONE = SOURCE.RESTAURANT_PHONE,
+    TARGET.OPERATING_HOURS = SOURCE.OPERATING_HOURS,
+    TARGET.LOCATION_ID_FK = SOURCE.LOCATION_ID_FK,
+    TARGET.ACTIVE_FLAG = SOURCE.ACTIVE_FLAG,
+    TARGET.OPEN_STATUS = SOURCE.OPEN_STATUS,
+    TARGET.LOCALITY = SOURCE.LOCALITY,
+    TARGET.RESTAURANT_ADDRESS = SOURCE.RESTAURANT_ADDRESS,
+    TARGET.LATITUDE = SOURCE.LATITUDE,
+    TARGET.LONGITUDE = SOURCE.LONGITUDE,
+    TARGET.CREATED_DT = SOURCE.CREATED_DT,
+    TARGET.MODIFIED_DT = SOURCE.MODIFIED_DT,
+    TARGET.STG_FILE_NAME = SOURCE.STG_FILE_NAME,
+    TARGET.STG_FILE_LOAD_TS = SOURCE.STG_FILE_LOAD_TS,
+    TARGET.STG_FILE_MD5 = SOURCE.STG_FILE_MD5,
+    TARGET.COPY_DATA_TS = SOURCE.COPY_DATA_TS
+    WHEN NOT MATCHED THEN
+INSERT (
+        RESTAURANT_ID,
+        NAME,
         CUISINE_TYPE,
         PRICING_FOR_TWO,
         RESTAURANT_PHONE,
         OPERATING_HOURS,
         LOCATION_ID_FK,
-        Active_Flag,
+        ACTIVE_FLAG,
         OPEN_STATUS,
         LOCALITY,
         RESTAURANT_ADDRESS,
         LATITUDE,
         LONGITUDE,
-        created_dt,
-        modified_dt,
-        stg_file_name,
-        stg_file_load_ts,
-        stg_file_md5,
-        copy_data_ts
+        CREATED_DT,
+        MODIFIED_DT,
+        STG_FILE_NAME,
+        STG_FILE_LOAD_TS,
+        STG_FILE_MD5,
+        COPY_DATA_TS
     )
-    VALUES (
-        source.restaurant_id,
-        source.name,
-        source.CUISINE_TYPE,
-        source.PRICING_FOR_TWO,
-        source.RESTAURANT_PHONE,
-        source.OPERATING_HOURS,
-        source.LOCATION_ID_FK,
-        source.Active_Flag,
-        source.OPEN_STATUS,
-        source.LOCALITY,
-        source.RESTAURANT_ADDRESS,
-        source.LATITUDE,
-        source.LONGITUDE,
-        source.created_dt,
-        source.modified_dt,
-        source.stg_file_name,
-        source.stg_file_load_ts,
-        source.stg_file_md5,
-        source.copy_data_ts
+VALUES (
+        SOURCE.RESTAURANT_ID,
+        SOURCE.NAME,
+        SOURCE.CUISINE_TYPE,
+        SOURCE.PRICING_FOR_TWO,
+        SOURCE.RESTAURANT_PHONE,
+        SOURCE.OPERATING_HOURS,
+        SOURCE.LOCATION_ID_FK,
+        SOURCE.ACTIVE_FLAG,
+        SOURCE.OPEN_STATUS,
+        SOURCE.LOCALITY,
+        SOURCE.RESTAURANT_ADDRESS,
+        SOURCE.LATITUDE,
+        SOURCE.LONGITUDE,
+        SOURCE.CREATED_DT,
+        SOURCE.MODIFIED_DT,
+        SOURCE.STG_FILE_NAME,
+        SOURCE.STG_FILE_LOAD_TS,
+        SOURCE.STG_FILE_MD5,
+        SOURCE.COPY_DATA_TS
     );
