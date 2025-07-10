@@ -43,7 +43,17 @@ THEN UPDATE SET
         target.LOCATION_ID_FK = source.LOCATION_ID_FK,
         target.STATUS = source.STATUS,
         target.GENDER = source.GENDER,
-        target.RATING = source.RATING 
+        target.RATING = source.RATING,
+        
+           --Updating Audit Colums--
+
+        target.created_dt = source.created_dt,
+        target.modified_dt = source.modified_dt,
+        target.stg_file_name = source.stg_file_name,
+        target.stg_file_load_ts = source.stg_file_load_ts,
+        target.stg_file_md5 = source.stg_file_md5,
+        target.copy_data_ts = source.copy_data_ts
+
 when not matched then insert
     (
       DELIVERY_AGENT_ID, 
