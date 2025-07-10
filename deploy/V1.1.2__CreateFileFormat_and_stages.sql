@@ -1,31 +1,12 @@
--- Use SysAdmin role to create objects --
-use role sysadmin;
-
--- use virtual warehouse--
-USE WAREHOUSE compute_wh;
-
--- Use Database --
-use database sandbox;
-
--- Create Schemas --
-use schema stage_sch;
-
--- Create File Format --
-create file format if not exists stage_sch.csv_file_format
-    type = 'csv'
-    compression = 'auto'
-    field_delimiter = ','
-    record_delimiter = '\n'
-    skip_header = 1
-    field_optionally_enclosed_by = '"'
-    null_if = ('\\N');
-
--- Create stage --
-create stage if not exists stage_sch.csv_stg
-    directory = (enable = true)
-    comment = 'this is a snowflake internal stage';
-
-
-
-
-
+-- USE SYSADMIN ROLE TO CREATE OBJECTS --
+USE ROLE SYSADMIN;
+-- USE VIRTUAL WAREHOUSE--
+USE WAREHOUSE COMPUTE_WH;
+-- USE DATABASE --
+USE DATABASE SANDBOX;
+-- CREATE SCHEMAS --
+USE SCHEMA STAGE_SCH;
+-- CREATE FILE FORMAT --
+CREATE FILE FORMAT IF NOT EXISTS STAGE_SCH.CSV_FILE_FORMAT TYPE = 'CSV' COMPRESSION = 'AUTO' FIELD_DELIMITER = ',' RECORD_DELIMITER = '\N' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"' NULL_IF = ('\\N');
+-- CREATE STAGE --
+CREATE STAGE IF NOT EXISTS STAGE_SCH.CSV_STG DIRECTORY = (ENABLE = TRUE) COMMENT = 'THIS IS A SNOWFLAKE INTERNAL STAGE';

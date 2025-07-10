@@ -1,129 +1,161 @@
-use role sysadmin;
-use database sandbox;
-USE WAREHOUSE compute_wh;
-
-merge into clean_sch.restaurant_location as target
-using
-(
-    select
-    cast(locationid as number) as location_id,
-    cast(city as string) as City,
-    case
-        when cast(state as string) = 'Delhi' then 'New Delhi'
-        else cast(state as string)
-    end as state,
-    CASE 
-            WHEN State = 'Delhi' THEN 'DL'
-            WHEN State = 'Maharashtra' THEN 'MH'
-            WHEN State = 'Uttar Pradesh' THEN 'UP'
-            WHEN State = 'Gujarat' THEN 'GJ'
-            WHEN State = 'Rajasthan' THEN 'RJ'
-            WHEN State = 'Kerala' THEN 'KL'
-            WHEN State = 'Punjab' THEN 'PB'
-            WHEN State = 'Karnataka' THEN 'KA'
-            WHEN State = 'Madhya Pradesh' THEN 'MP'
-            WHEN State = 'Odisha' THEN 'OR'
-            WHEN State = 'Chandigarh' THEN 'CH'
-            WHEN State = 'West Bengal' THEN 'WB'
-            WHEN State = 'Sikkim' THEN 'SK'
-            WHEN State = 'Andhra Pradesh' THEN 'AP'
-            WHEN State = 'Assam' THEN 'AS'
-            WHEN State = 'Jammu and Kashmir' THEN 'JK'
-            WHEN State = 'Puducherry' THEN 'PY'
-            WHEN State = 'Uttarakhand' THEN 'UK'
-            WHEN State = 'Himachal Pradesh' THEN 'HP'
-            WHEN State = 'Tamil Nadu' THEN 'TN'
-            WHEN State = 'Goa' THEN 'GA'
-            WHEN State = 'Telangana' THEN 'TG'
-            WHEN State = 'Chhattisgarh' THEN 'CG'
-            WHEN State = 'Jharkhand' THEN 'JH'
-            WHEN State = 'Bihar' THEN 'BR'
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+MERGE INTO CLEAN_SCH.RESTAURANT_LOCATION AS TARGET USING (
+    SELECT CAST(LOCATIONID AS NUMBER) AS LOCATION_ID,
+        CAST(CITY AS STRING) AS CITY,
+        CASE
+            WHEN CAST(STATE AS STRING) = 'DELHI' THEN 'NEW DELHI'
+            ELSE CAST(STATE AS STRING)
+        END AS STATE,
+        CASE
+            WHEN STATE = 'DELHI' THEN 'DL'
+            WHEN STATE = 'MAHARASHTRA' THEN 'MH'
+            WHEN STATE = 'UTTAR PRADESH' THEN 'UP'
+            WHEN STATE = 'GUJARAT' THEN 'GJ'
+            WHEN STATE = 'RAJASTHAN' THEN 'RJ'
+            WHEN STATE = 'KERALA' THEN 'KL'
+            WHEN STATE = 'PUNJAB' THEN 'PB'
+            WHEN STATE = 'KARNATAKA' THEN 'KA'
+            WHEN STATE = 'MADHYA PRADESH' THEN 'MP'
+            WHEN STATE = 'ODISHA' THEN 'OR'
+            WHEN STATE = 'CHANDIGARH' THEN 'CH'
+            WHEN STATE = 'WEST BENGAL' THEN 'WB'
+            WHEN STATE = 'SIKKIM' THEN 'SK'
+            WHEN STATE = 'ANDHRA PRADESH' THEN 'AP'
+            WHEN STATE = 'ASSAM' THEN 'AS'
+            WHEN STATE = 'JAMMU AND KASHMIR' THEN 'JK'
+            WHEN STATE = 'PUDUCHERRY' THEN 'PY'
+            WHEN STATE = 'UTTARAKHAND' THEN 'UK'
+            WHEN STATE = 'HIMACHAL PRADESH' THEN 'HP'
+            WHEN STATE = 'TAMIL NADU' THEN 'TN'
+            WHEN STATE = 'GOA' THEN 'GA'
+            WHEN STATE = 'TELANGANA' THEN 'TG'
+            WHEN STATE = 'CHHATTISGARH' THEN 'CG'
+            WHEN STATE = 'JHARKHAND' THEN 'JH'
+            WHEN STATE = 'BIHAR' THEN 'BR'
             ELSE NULL
-        END AS state_code,
-        CASE 
-            WHEN State IN ('Delhi', 'Chandigarh', 'Puducherry', 'Jammu and Kashmir') THEN 'Y'
+        END AS STATE_CODE,
+        CASE
+            WHEN STATE IN (
+                'DELHI',
+                'CHANDIGARH',
+                'PUDUCHERRY',
+                'JAMMU AND KASHMIR'
+            ) THEN 'Y'
             ELSE 'N'
-        END AS is_union_territory,
-        CASE 
-            WHEN (State = 'Delhi' AND City = 'New Delhi') THEN TRUE
-            WHEN (State = 'Maharashtra' AND City = 'Mumbai') THEN TRUE
-            -- Other conditions for capital cities
+        END AS IS_UNION_TERRITORY,
+        CASE
+            WHEN (
+                STATE = 'DELHI'
+                AND CITY = 'NEW DELHI'
+            ) THEN TRUE
+            WHEN (
+                STATE = 'MAHARASHTRA'
+                AND CITY = 'MUMBAI'
+            ) THEN TRUE -- OTHER CONDITIONS FOR CAPITAL CITIES
             ELSE FALSE
-        END AS capital_city_flag,
-        CASE 
-            WHEN City IN ('Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune', 'Ahmedabad') THEN 'Tier-1'
-            WHEN City IN ('Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Bhopal', 'Patna', 'Vadodara', 'Coimbatore', 
-                          'Ludhiana', 'Agra', 'Nashik', 'Ranchi', 'Meerut', 'Raipur', 'Guwahati', 'Chandigarh') THEN 'Tier-2'
-            ELSE 'Tier-3'
-        END AS city_tier,
-        CAST(Zipcode as STRING) as Zip_code,
-        Cast(ActiveFlag as String) as Active_Flag,
-        TO_TIMESTAMP_TZ(CreatedDate, 'YYYY-MM-DD HH24:MI:SS') as created_ts,
-        TO_TIMESTAMP_TZ(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') as modified_ts,
-        stg_file_name,
-        stg_file_load_ts,
-        stg_file_md5,
-        current_timestamp as copy_data_ts
-        from stage_sch.location_stm
-) as source 
-on target.location_id = source.location_id
-when matched and (
-    target.City != source.City OR
-    target.State != source.State OR
-    target.state_code != source.state_code OR
-    target.is_union_territory != source.is_union_territory OR
-    target.capital_city_flag != source.capital_city_flag OR
-    target.city_tier != source.city_tier OR
-    target.Zip_Code != source.Zip_Code OR
-    target.Active_Flag != source.Active_Flag OR
-    target.modified_ts != source.modified_ts
-) THEN 
-    UPDATE SET 
-        target.City = source.City,
-        target.State = source.State,
-        target.state_code = source.state_code,
-        target.is_union_territory = source.is_union_territory,
-        target.capital_city_flag = source.capital_city_flag,
-        target.city_tier = source.city_tier,
-        target.Zip_Code = source.Zip_Code,
-        target.Active_Flag = source.Active_Flag,
-        target.modified_ts = source.modified_ts,
-        target.stg_file_name = source.stg_file_name,
-        target.stg_file_load_ts = source.stg_file_load_ts,
-        target.stg_file_md5 = source.stg_file_md5,
-        target.copy_data_ts = source.copy_data_ts
-when not matched then
-    insert (
-        Location_ID,
-        City,
-        State,
-        state_code,
-        is_union_territory,
-        capital_city_flag,
-        city_tier,
-        Zip_Code,
-        Active_Flag,
-        created_ts,
-        modified_ts,
-        stg_file_name,
-        stg_file_load_ts,
-        stg_file_md5,
-        copy_data_ts
+        END AS CAPITAL_CITY_FLAG,
+        CASE
+            WHEN CITY IN (
+                'MUMBAI',
+                'DELHI',
+                'BENGALURU',
+                'HYDERABAD',
+                'CHENNAI',
+                'KOLKATA',
+                'PUNE',
+                'AHMEDABAD'
+            ) THEN 'TIER-1'
+            WHEN CITY IN (
+                'JAIPUR',
+                'LUCKNOW',
+                'KANPUR',
+                'NAGPUR',
+                'INDORE',
+                'BHOPAL',
+                'PATNA',
+                'VADODARA',
+                'COIMBATORE',
+                'LUDHIANA',
+                'AGRA',
+                'NASHIK',
+                'RANCHI',
+                'MEERUT',
+                'RAIPUR',
+                'GUWAHATI',
+                'CHANDIGARH'
+            ) THEN 'TIER-2'
+            ELSE 'TIER-3'
+        END AS CITY_TIER,
+        CAST(ZIPCODE AS STRING) AS ZIP_CODE,
+        CAST(ACTIVEFLAG AS STRING) AS ACTIVE_FLAG,
+        TO_TIMESTAMP_TZ(CREATEDDATE, 'YYYY-MM-DD HH24:MI:SS') AS CREATED_TS,
+        TO_TIMESTAMP_TZ(MODIFIEDDATE, 'YYYY-MM-DD HH24:MI:SS') AS MODIFIED_TS,
+        STG_FILE_NAME,
+        STG_FILE_LOAD_TS,
+        STG_FILE_MD5,
+        CURRENT_TIMESTAMP AS COPY_DATA_TS
+    FROM STAGE_SCH.LOCATION_STM
+) AS SOURCE ON TARGET.LOCATION_ID = SOURCE.LOCATION_ID
+WHEN MATCHED
+AND (
+    TARGET.CITY != SOURCE.CITY
+    OR TARGET.STATE != SOURCE.STATE
+    OR TARGET.STATE_CODE != SOURCE.STATE_CODE
+    OR TARGET.IS_UNION_TERRITORY != SOURCE.IS_UNION_TERRITORY
+    OR TARGET.CAPITAL_CITY_FLAG != SOURCE.CAPITAL_CITY_FLAG
+    OR TARGET.CITY_TIER != SOURCE.CITY_TIER
+    OR TARGET.ZIP_CODE != SOURCE.ZIP_CODE
+    OR TARGET.ACTIVE_FLAG != SOURCE.ACTIVE_FLAG
+    OR TARGET.MODIFIED_TS != SOURCE.MODIFIED_TS
+) THEN
+UPDATE
+SET TARGET.CITY = SOURCE.CITY,
+    TARGET.STATE = SOURCE.STATE,
+    TARGET.STATE_CODE = SOURCE.STATE_CODE,
+    TARGET.IS_UNION_TERRITORY = SOURCE.IS_UNION_TERRITORY,
+    TARGET.CAPITAL_CITY_FLAG = SOURCE.CAPITAL_CITY_FLAG,
+    TARGET.CITY_TIER = SOURCE.CITY_TIER,
+    TARGET.ZIP_CODE = SOURCE.ZIP_CODE,
+    TARGET.ACTIVE_FLAG = SOURCE.ACTIVE_FLAG,
+    TARGET.MODIFIED_TS = SOURCE.MODIFIED_TS,
+    TARGET.STG_FILE_NAME = SOURCE.STG_FILE_NAME,
+    TARGET.STG_FILE_LOAD_TS = SOURCE.STG_FILE_LOAD_TS,
+    TARGET.STG_FILE_MD5 = SOURCE.STG_FILE_MD5,
+    TARGET.COPY_DATA_TS = SOURCE.COPY_DATA_TS
+    WHEN NOT MATCHED THEN
+INSERT (
+        LOCATION_ID,
+        CITY,
+        STATE,
+        STATE_CODE,
+        IS_UNION_TERRITORY,
+        CAPITAL_CITY_FLAG,
+        CITY_TIER,
+        ZIP_CODE,
+        ACTIVE_FLAG,
+        CREATED_TS,
+        MODIFIED_TS,
+        STG_FILE_NAME,
+        STG_FILE_LOAD_TS,
+        STG_FILE_MD5,
+        COPY_DATA_TS
     )
-    VALUES (
-        source.Location_ID,
-        source.City,
-        source.State,
-        source.state_code,
-        source.is_union_territory,
-        source.capital_city_flag,
-        source.city_tier,
-        source.Zip_Code,
-        source.Active_Flag,
-        source.created_ts,
-        source.modified_ts,
-        source.stg_file_name,
-        source.stg_file_load_ts,
-        source.stg_file_md5,
-        source.copy_data_ts
+VALUES (
+        SOURCE.LOCATION_ID,
+        SOURCE.CITY,
+        SOURCE.STATE,
+        SOURCE.STATE_CODE,
+        SOURCE.IS_UNION_TERRITORY,
+        SOURCE.CAPITAL_CITY_FLAG,
+        SOURCE.CITY_TIER,
+        SOURCE.ZIP_CODE,
+        SOURCE.ACTIVE_FLAG,
+        SOURCE.CREATED_TS,
+        SOURCE.MODIFIED_TS,
+        SOURCE.STG_FILE_NAME,
+        SOURCE.STG_FILE_LOAD_TS,
+        SOURCE.STG_FILE_MD5,
+        SOURCE.COPY_DATA_TS
     );

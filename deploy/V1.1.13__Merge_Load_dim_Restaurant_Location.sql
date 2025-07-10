@@ -1,80 +1,93 @@
-use role sysadmin;
-use database sandbox;
-USE WAREHOUSE compute_wh;
-
-merge into CONSUMPTION_SCH.RESTAURANT_LOCATION_DIM AS target
-using
-    clean_sch.restaurant_location_stm as source 
-    on target.location_id = source.location_id and
-        target.active_flag = source.active_flag
-    
-    when matched and source.metadata$action = 'DELETE' and Source.metadata$isupdate = TRUE
-then
- update SET 
-        target.eff_end_dt = current_timestamp(),
-        target.current_flag = FALSE
-
-    when not matched and Source.metadata$action = 'INSERT' and Source.metadata$isupdate = TRUE
-then
-    insert (
-    RESTAURANT_LOCATION_HK ,
-	LOCATION_ID ,
-	CITY ,
-	STATE ,
-	STATE_CODE ,
-	IS_UNION_TERRITORY ,
-	CAPITAL_CITY_FLAG ,
-	CITY_TIER ,
-	ZIP_CODE ,
-	ACTIVE_FLAG ,
-	EFF_START_DT,
-    EFF_END_DT,
-    CURRENT_FLAG
-    ) values 
-    (
-        hash(sha1_hex(concat(source.CITY, source.STATE, source.STATE_CODE, source.ZIP_CODE))),
-        source.LOCATION_ID,
-        source.CITY,
-        source.STATE,
-        source.STATE_CODE,
-        source.IS_UNION_TERRITORY,
-        source.CAPITAL_CITY_FLAG,
-        source.CITY_TIER,
-        source.ZIP_CODE,
-        source.ACTIVE_FLAG,
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+MERGE INTO CONSUMPTION_SCH.RESTAURANT_LOCATION_DIM AS TARGET USING CLEAN_SCH.RESTAURANT_LOCATION_STM AS SOURCE ON TARGET.LOCATION_ID = SOURCE.LOCATION_ID
+AND TARGET.ACTIVE_FLAG = SOURCE.ACTIVE_FLAG
+WHEN MATCHED
+AND SOURCE.METADATA $ACTION = 'DELETE'
+AND SOURCE.METADATA $ISUPDATE = TRUE THEN
+UPDATE
+SET TARGET.EFF_END_DT = CURRENT_TIMESTAMP(),
+    TARGET.CURRENT_FLAG = FALSE
+    WHEN NOT MATCHED
+    AND SOURCE.METADATA $ACTION = 'INSERT'
+    AND SOURCE.METADATA $ISUPDATE = TRUE THEN
+INSERT (
+        RESTAURANT_LOCATION_HK,
+        LOCATION_ID,
+        CITY,
+        STATE,
+        STATE_CODE,
+        IS_UNION_TERRITORY,
+        CAPITAL_CITY_FLAG,
+        CITY_TIER,
+        ZIP_CODE,
+        ACTIVE_FLAG,
+        EFF_START_DT,
+        EFF_END_DT,
+        CURRENT_FLAG
+    )
+VALUES (
+        HASH(
+            SHA1_HEX(
+                CONCAT(
+                    SOURCE.CITY,
+                    SOURCE.STATE,
+                    SOURCE.STATE_CODE,
+                    SOURCE.ZIP_CODE
+                )
+            )
+        ),
+        SOURCE.LOCATION_ID,
+        SOURCE.CITY,
+        SOURCE.STATE,
+        SOURCE.STATE_CODE,
+        SOURCE.IS_UNION_TERRITORY,
+        SOURCE.CAPITAL_CITY_FLAG,
+        SOURCE.CITY_TIER,
+        SOURCE.ZIP_CODE,
+        SOURCE.ACTIVE_FLAG,
         CURRENT_TIMESTAMP(),
         NULL,
         TRUE
     )
-
-    when not matched THEN
-    insert (
-    RESTAURANT_LOCATION_HK ,
-	LOCATION_ID ,
-	CITY ,
-	STATE ,
-	STATE_CODE ,
-	IS_UNION_TERRITORY ,
-	CAPITAL_CITY_FLAG ,
-	CITY_TIER ,
-	ZIP_CODE ,
-	ACTIVE_FLAG ,
-	EFF_START_DT,
-    EFF_END_DT,
-    CURRENT_FLAG
-    ) values (
-        hash(sha1_hex(concat(source.CITY, source.STATE, source.STATE_CODE, source.ZIP_CODE))),
-        source.LOCATION_ID,
-        source.CITY,
-        source.STATE,
-        source.STATE_CODE,
-        source.IS_UNION_TERRITORY,
-        source.CAPITAL_CITY_FLAG,
-        source.CITY_TIER,
-        source.ZIP_CODE,
-        source.ACTIVE_FLAG,
+    WHEN NOT MATCHED THEN
+INSERT (
+        RESTAURANT_LOCATION_HK,
+        LOCATION_ID,
+        CITY,
+        STATE,
+        STATE_CODE,
+        IS_UNION_TERRITORY,
+        CAPITAL_CITY_FLAG,
+        CITY_TIER,
+        ZIP_CODE,
+        ACTIVE_FLAG,
+        EFF_START_DT,
+        EFF_END_DT,
+        CURRENT_FLAG
+    )
+VALUES (
+        HASH(
+            SHA1_HEX(
+                CONCAT(
+                    SOURCE.CITY,
+                    SOURCE.STATE,
+                    SOURCE.STATE_CODE,
+                    SOURCE.ZIP_CODE
+                )
+            )
+        ),
+        SOURCE.LOCATION_ID,
+        SOURCE.CITY,
+        SOURCE.STATE,
+        SOURCE.STATE_CODE,
+        SOURCE.IS_UNION_TERRITORY,
+        SOURCE.CAPITAL_CITY_FLAG,
+        SOURCE.CITY_TIER,
+        SOURCE.ZIP_CODE,
+        SOURCE.ACTIVE_FLAG,
         CURRENT_TIMESTAMP(),
         NULL,
         TRUE
     );
-

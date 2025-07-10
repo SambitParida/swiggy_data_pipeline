@@ -1,90 +1,78 @@
-use role sysadmin;
-
-use database sandbox;
-
-USE WAREHOUSE compute_wh;
-
-merge into
-    clean_sch.DELIVERY_AGENT as target using (
-        select
-            try_cast(DELIVERYAGENTID as number) as DELIVERY_AGENT_ID,
-            try_cast(NAME as string) as NAME,
-            try_cast(PHONE as string) as PHONE,
-            try_cast(VEHICLETYPE as string) as VEHICLE_TYPE,
-            try_cast(LOCATIONID as NUMBER) as LOCATION_ID_FK,
-            try_cast(STATUS as string) as STATUS,
-            try_cast(GENDER as string) as GENDER,
-            try_cast(RATING as NUMBER) as RATING,
-            TRY_TO_TIMESTAMP_NTZ(CreatedDate, 'YYYY-MM-DD HH24:MI:SS.FF6') as created_dt,
-            TRY_TO_TIMESTAMP_NTZ(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS.FF6') as modified_dt,
-            stg_file_name,
-            stg_file_load_ts,
-            stg_file_md5,
-            current_timestamp as copy_data_ts
-        from
-            stage_sch.DELIVERYAGENT_STM
-    ) as source on target.DELIVERY_AGENT_ID = source.DELIVERY_AGENT_ID
-when matched and
-    (
-
-        target.NAME != source.NAME or 
-        target.PHONE != source.PHONE OR
-        target.VEHICLE_TYPE != source.VEHICLE_TYPE OR
-        target.LOCATION_ID_FK != source.LOCATION_ID_FK OR
-        target.STATUS != source.STATUS OR
-        target.GENDER != source.GENDER OR
-        target.RATING != source.RATING 
-
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+MERGE INTO CLEAN_SCH.DELIVERY_AGENT AS TARGET USING (
+    SELECT TRY_CAST(DELIVERYAGENTID AS NUMBER) AS DELIVERY_AGENT_ID,
+        TRY_CAST(NAME AS STRING) AS NAME,
+        TRY_CAST(PHONE AS STRING) AS PHONE,
+        TRY_CAST(VEHICLETYPE AS STRING) AS VEHICLE_TYPE,
+        TRY_CAST(LOCATIONID AS NUMBER) AS LOCATION_ID_FK,
+        TRY_CAST(STATUS AS STRING) AS STATUS,
+        TRY_CAST(GENDER AS STRING) AS GENDER,
+        TRY_CAST(RATING AS NUMBER) AS RATING,
+        TRY_TO_TIMESTAMP_NTZ(CREATEDDATE, 'YYYY-MM-DD HH24:MI:SS.FF6') AS CREATED_DT,
+        TRY_TO_TIMESTAMP_NTZ(MODIFIEDDATE, 'YYYY-MM-DD HH24:MI:SS.FF6') AS MODIFIED_DT,
+        STG_FILE_NAME,
+        STG_FILE_LOAD_TS,
+        STG_FILE_MD5,
+        CURRENT_TIMESTAMP AS COPY_DATA_TS
+    FROM STAGE_SCH.DELIVERYAGENT_STM
+) AS SOURCE ON TARGET.DELIVERY_AGENT_ID = SOURCE.DELIVERY_AGENT_ID
+WHEN MATCHED
+AND (
+    TARGET.NAME != SOURCE.NAME
+    OR TARGET.PHONE != SOURCE.PHONE
+    OR TARGET.VEHICLE_TYPE != SOURCE.VEHICLE_TYPE
+    OR TARGET.LOCATION_ID_FK != SOURCE.LOCATION_ID_FK
+    OR TARGET.STATUS != SOURCE.STATUS
+    OR TARGET.GENDER != SOURCE.GENDER
+    OR TARGET.RATING != SOURCE.RATING
+) THEN
+UPDATE
+SET TARGET.NAME = SOURCE.NAME,
+    TARGET.PHONE = SOURCE.PHONE,
+    TARGET.VEHICLE_TYPE = SOURCE.VEHICLE_TYPE,
+    TARGET.LOCATION_ID_FK = SOURCE.LOCATION_ID_FK,
+    TARGET.STATUS = SOURCE.STATUS,
+    TARGET.GENDER = SOURCE.GENDER,
+    TARGET.RATING = SOURCE.RATING,
+    --UPDATING AUDIT COLUMS--
+    TARGET.CREATED_DT = SOURCE.CREATED_DT,
+    TARGET.MODIFIED_DT = SOURCE.MODIFIED_DT,
+    TARGET.STG_FILE_NAME = SOURCE.STG_FILE_NAME,
+    TARGET.STG_FILE_LOAD_TS = SOURCE.STG_FILE_LOAD_TS,
+    TARGET.STG_FILE_MD5 = SOURCE.STG_FILE_MD5,
+    TARGET.COPY_DATA_TS = SOURCE.COPY_DATA_TS
+    WHEN NOT MATCHED THEN
+INSERT (
+        DELIVERY_AGENT_ID,
+        NAME,
+        PHONE,
+        VEHICLE_TYPE,
+        LOCATION_ID_FK,
+        STATUS,
+        GENDER,
+        RATING,
+        CREATED_DT,
+        MODIFIED_DT,
+        STG_FILE_NAME,
+        STG_FILE_LOAD_TS,
+        STG_FILE_MD5,
+        COPY_DATA_TS
     )
-THEN UPDATE SET
-        target.NAME = source.NAME,
-        target.PHONE = source.PHONE,
-        target.VEHICLE_TYPE = source.VEHICLE_TYPE,
-        target.LOCATION_ID_FK = source.LOCATION_ID_FK,
-        target.STATUS = source.STATUS,
-        target.GENDER = source.GENDER,
-        target.RATING = source.RATING,
-        
-           --Updating Audit Colums--
-
-        target.created_dt = source.created_dt,
-        target.modified_dt = source.modified_dt,
-        target.stg_file_name = source.stg_file_name,
-        target.stg_file_load_ts = source.stg_file_load_ts,
-        target.stg_file_md5 = source.stg_file_md5,
-        target.copy_data_ts = source.copy_data_ts
-
-when not matched then insert
-    (
-      DELIVERY_AGENT_ID, 
-      NAME, 
-      PHONE, 
-      VEHICLE_TYPE, 
-      LOCATION_ID_FK, 
-      STATUS, 
-      GENDER, 
-      RATING,
-      CREATED_DT, 
-      MODIFIED_DT, 
-      STG_FILE_NAME, 
-      STG_FILE_LOAD_TS, 
-      STG_FILE_MD5, 
-      COPY_DATA_TS
-    )
-VALUES
-    (
-      source.DELIVERY_AGENT_ID, 
-      source.NAME, 
-      source.PHONE, 
-      source.VEHICLE_TYPE, 
-      source.LOCATION_ID_FK, 
-      source.STATUS, 
-      source.GENDER, 
-      source.RATING,
-      source.CREATED_DT, 
-      source.MODIFIED_DT, 
-      source.STG_FILE_NAME, 
-      source.STG_FILE_LOAD_TS, 
-      source.STG_FILE_MD5, 
-      source.COPY_DATA_TS
+VALUES (
+        SOURCE.DELIVERY_AGENT_ID,
+        SOURCE.NAME,
+        SOURCE.PHONE,
+        SOURCE.VEHICLE_TYPE,
+        SOURCE.LOCATION_ID_FK,
+        SOURCE.STATUS,
+        SOURCE.GENDER,
+        SOURCE.RATING,
+        SOURCE.CREATED_DT,
+        SOURCE.MODIFIED_DT,
+        SOURCE.STG_FILE_NAME,
+        SOURCE.STG_FILE_LOAD_TS,
+        SOURCE.STG_FILE_MD5,
+        SOURCE.COPY_DATA_TS
     );

@@ -1,220 +1,284 @@
-use role sysadmin;
-use database sandbox;
-USE WAREHOUSE data_load_wh;
-
-/*Copy Data from named internal stage  to staging table */
-
-copy into stage_sch.restaurant 
-    (restaurantid,      
-    name,  cuisinetype,    pricing_for_2,    restaurant_phone,    operatinghours,    locationid,    activeflag,    openstatus,
-    locality,    restaurant_address,    latitude,    longitude,    createddate,    modifieddate,     stg_file_name,    stg_file_load_ts,
-    stg_file_md5,    copy_data_ts 
-    )
-from (
-select 
-    t.$1::text as restaurantid,
-    t.$2::text as name,
-    t.$3::text as cuisinetype,
-    t.$4::text as pricing_for_2,
-    t.$5::text as restaurant_phone,
-    t.$6::text as operatinghours,
-    t.$7::text as locationid,
-    t.$8::text as activeflag,
-    t.$9::text as openstatus,
-    t.$10::text as locality,
-    t.$11::text as restaurant_address,
-    t.$12::text as latitude,
-    t.$13::text as longitude,
-    t.$14::text as createddate,
-    t.$15::text as modifieddate,
-    metadata$filename as stg_file_name,
-    metadata$file_last_modified as stg_file_load_ts,
-    metadata$file_content_key as stg_file_md5,
-    current_timestamp as copy_data_ts    
- from @stage_sch.csv_stg/initial/restaurant t)
- file_format = (format_name = 'stage_sch.csv_file_format') 
-on_error = abort_statement;
-
-copy into stage_sch.customer 
-    (  customerid ,
-    name, 
-    mobile ,
-    email ,
-    loginbyusing ,
-    gender ,
-    dob ,
-    anniversary,
-    preferences ,
-    createddate ,
-    modifieddate ,    stg_file_name,    stg_file_load_ts,
-    stg_file_md5,    copy_data_ts 
-    )
-from (
-select 
-    t.$1::text as customerid,
-    t.$2::text as name,
-    t.$3::text as mobile,
-    t.$4::text as email,
-    t.$5::text as loginbyusing,
-    t.$6::text as gender,
-    t.$7::text as dob,
-    t.$8::text as anniversary,
-    t.$9::text as preferences,
-    t.$10::text as createddate,
-    t.$11::text as modifieddate,
-    metadata$filename as stg_file_name,
-    metadata$file_last_modified as stg_file_load_ts,
-    metadata$file_content_key as stg_file_md5,
-    current_timestamp as copy_data_ts    
- from @stage_sch.csv_stg/initial/customers t)
- file_format = (format_name = 'stage_sch.csv_file_format') 
-on_error = abort_statement;
-
-copy into stage_sch.customeraddress (addressid, customerid, flatno, houseno, floor, building, 
-                               landmark, locality,city,pincode, state, coordinates, primaryflag, addresstype, 
-                               createddate, modifieddate, 
-                               stg_file_name, stg_file_load_ts, stg_file_md5, copy_data_ts)
-from (
-    select 
-        t.$1::text as addressid,
-        t.$2::text as customerid,
-        t.$3::text as flatno,
-        t.$4::text as houseno,
-        t.$5::text as floor,
-        t.$6::text as building,
-        t.$7::text as landmark,
-        t.$8::text as locality,
-        t.$9::text as city,
-        t.$10::text as State,
-        t.$11::text as Pincode,
-        t.$12::text as coordinates,
-        t.$13::text as primaryflag,
-        t.$14::text as addresstype,
-        t.$15::text as createddate,
-        t.$16::text as modifieddate,
-        metadata$filename as stg_file_name,
-        metadata$file_last_modified as stg_file_load_ts,
-        metadata$file_content_key as stg_file_md5,
-        current_timestamp as copy_data_ts
-    from @stage_sch.csv_stg/initial/customer_address t
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE DATA_LOAD_WH;
+/*COPY DATA FROM NAMED INTERNAL STAGE  TO STAGING TABLE */
+COPY INTO STAGE_SCH.RESTAURANT (
+    RESTAURANTID,
+    NAME,
+    CUISINETYPE,
+    PRICING_FOR_2,
+    RESTAURANT_PHONE,
+    OPERATINGHOURS,
+    LOCATIONID,
+    ACTIVEFLAG,
+    OPENSTATUS,
+    LOCALITY,
+    RESTAURANT_ADDRESS,
+    LATITUDE,
+    LONGITUDE,
+    CREATEDDATE,
+    MODIFIEDDATE,
+    STG_FILE_NAME,
+    STG_FILE_LOAD_TS,
+    STG_FILE_MD5,
+    COPY_DATA_TS
 )
-file_format = (format_name = 'stage_sch.csv_file_format')
-on_error = abort_statement;
-
-copy into stage_sch.menu (menuid, restaurantid, itemname, description, price, category, 
-                availability, itemtype, createddate, modifieddate,
-                stg_file_name, stg_file_load_ts, stg_file_md5, copy_data_ts)
-from (
-    select 
-        t.$1::text as menuid,
-        t.$2::text as restaurantid,
-        t.$3::text as itemname,
-        t.$4::text as description,
-        t.$5::text as price,
-        t.$6::text as category,
-        t.$7::text as availability,
-        t.$8::text as itemtype,
-        t.$9::text as createddate,
-        t.$10::text as modifieddate,
-        metadata$filename as stg_file_name,
-        metadata$file_last_modified as stg_file_load_ts,
-        metadata$file_content_key as stg_file_md5,
-        current_timestamp as copy_data_ts
-    from @stage_sch.csv_stg/initial/menu t
+FROM (
+        SELECT T.$1::TEXT AS RESTAURANTID,
+            T.$2::TEXT AS NAME,
+            T.$3::TEXT AS CUISINETYPE,
+            T.$4::TEXT AS PRICING_FOR_2,
+            T.$5::TEXT AS RESTAURANT_PHONE,
+            T.$6::TEXT AS OPERATINGHOURS,
+            T.$7::TEXT AS LOCATIONID,
+            T.$8::TEXT AS ACTIVEFLAG,
+            T.$9::TEXT AS OPENSTATUS,
+            T.$10::TEXT AS LOCALITY,
+            T.$11::TEXT AS RESTAURANT_ADDRESS,
+            T.$12::TEXT AS LATITUDE,
+            T.$13::TEXT AS LONGITUDE,
+            T.$14::TEXT AS CREATEDDATE,
+            T.$15::TEXT AS MODIFIEDDATE,
+            METADATA $FILENAME AS STG_FILE_NAME,
+            METADATA $FILE_LAST_MODIFIED AS STG_FILE_LOAD_TS,
+            METADATA $FILE_CONTENT_KEY AS STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM @STAGE_SCH.CSV_STG / INITIAL / RESTAURANT T
+    ) FILE_FORMAT = (FORMAT_NAME = 'STAGE_SCH.CSV_FILE_FORMAT') ON_ERROR = ABORT_STATEMENT;
+COPY INTO STAGE_SCH.CUSTOMER (
+    CUSTOMERID,
+    NAME,
+    MOBILE,
+    EMAIL,
+    LOGINBYUSING,
+    GENDER,
+    DOB,
+    ANNIVERSARY,
+    PREFERENCES,
+    CREATEDDATE,
+    MODIFIEDDATE,
+    STG_FILE_NAME,
+    STG_FILE_LOAD_TS,
+    STG_FILE_MD5,
+    COPY_DATA_TS
 )
-file_format = (format_name = 'stage_sch.csv_file_format')
-on_error = abort_statement;
-
-copy into stage_sch.deliveryagent (deliveryagentid, name, phone, vehicletype, locationid, 
-                         status, gender, rating, createddate, modifieddate,
-                         stg_file_name, stg_file_load_ts, stg_file_md5, copy_data_ts)
-from (
-    select 
-        t.$1::text as deliveryagentid,
-        t.$2::text as name,
-        t.$3::text as phone,
-        t.$4::text as vehicletype,
-        t.$5::text as locationid,
-        t.$6::text as status,
-        t.$7::text as gender,
-        t.$8::text as rating,
-        t.$9::text as createddate,
-        t.$10::text as modifieddate,
-        metadata$filename as stg_file_name,
-        metadata$file_last_modified as stg_file_load_ts,
-        metadata$file_content_key as stg_file_md5,
-        current_timestamp as copy_data_ts
-    from @stage_sch.csv_stg/initial/delivery_agent t
+FROM (
+        SELECT T.$1::TEXT AS CUSTOMERID,
+            T.$2::TEXT AS NAME,
+            T.$3::TEXT AS MOBILE,
+            T.$4::TEXT AS EMAIL,
+            T.$5::TEXT AS LOGINBYUSING,
+            T.$6::TEXT AS GENDER,
+            T.$7::TEXT AS DOB,
+            T.$8::TEXT AS ANNIVERSARY,
+            T.$9::TEXT AS PREFERENCES,
+            T.$10::TEXT AS CREATEDDATE,
+            T.$11::TEXT AS MODIFIEDDATE,
+            METADATA $FILENAME AS STG_FILE_NAME,
+            METADATA $FILE_LAST_MODIFIED AS STG_FILE_LOAD_TS,
+            METADATA $FILE_CONTENT_KEY AS STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM @STAGE_SCH.CSV_STG / INITIAL / CUSTOMERS T
+    ) FILE_FORMAT = (FORMAT_NAME = 'STAGE_SCH.CSV_FILE_FORMAT') ON_ERROR = ABORT_STATEMENT;
+COPY INTO STAGE_SCH.CUSTOMERADDRESS (
+    ADDRESSID,
+    CUSTOMERID,
+    FLATNO,
+    HOUSENO,
+    FLOOR,
+    BUILDING,
+    LANDMARK,
+    LOCALITY,
+    CITY,
+    PINCODE,
+    STATE,
+    COORDINATES,
+    PRIMARYFLAG,
+    ADDRESSTYPE,
+    CREATEDDATE,
+    MODIFIEDDATE,
+    STG_FILE_NAME,
+    STG_FILE_LOAD_TS,
+    STG_FILE_MD5,
+    COPY_DATA_TS
 )
-file_format = (format_name = 'stage_sch.csv_file_format')
-on_error = abort_statement;
-
-copy into stage_sch.delivery (deliveryid,orderid, deliveryagentid, deliverystatus, 
-                    estimatedtime, addressid, deliverydate, createddate, 
-                    modifieddate, stg_file_name, stg_file_load_ts, 
-                    stg_file_md5, copy_data_ts)
-from (
-    select 
-        t.$1::text as deliveryid,
-        t.$2::text as orderid,
-        t.$3::text as deliveryagentid,
-        t.$4::text as deliverystatus,
-        t.$5::text as estimatedtime,
-        t.$6::text as addressid,
-        t.$7::text as deliverydate,
-        t.$8::text as createddate,
-        t.$9::text as modifieddate,
-        metadata$filename as stg_file_name,
-        metadata$file_last_modified as stg_file_load_ts,
-        metadata$file_content_key as stg_file_md5,
-        current_timestamp as copy_data_ts
-    from @stage_sch.csv_stg/initial/delivery/ t
+FROM (
+        SELECT T.$1::TEXT AS ADDRESSID,
+            T.$2::TEXT AS CUSTOMERID,
+            T.$3::TEXT AS FLATNO,
+            T.$4::TEXT AS HOUSENO,
+            T.$5::TEXT AS FLOOR,
+            T.$6::TEXT AS BUILDING,
+            T.$7::TEXT AS LANDMARK,
+            T.$8::TEXT AS LOCALITY,
+            T.$9::TEXT AS CITY,
+            T.$10::TEXT AS STATE,
+            T.$11::TEXT AS PINCODE,
+            T.$12::TEXT AS COORDINATES,
+            T.$13::TEXT AS PRIMARYFLAG,
+            T.$14::TEXT AS ADDRESSTYPE,
+            T.$15::TEXT AS CREATEDDATE,
+            T.$16::TEXT AS MODIFIEDDATE,
+            METADATA $FILENAME AS STG_FILE_NAME,
+            METADATA $FILE_LAST_MODIFIED AS STG_FILE_LOAD_TS,
+            METADATA $FILE_CONTENT_KEY AS STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM @STAGE_SCH.CSV_STG / INITIAL / CUSTOMER_ADDRESS T
+    ) FILE_FORMAT = (FORMAT_NAME = 'STAGE_SCH.CSV_FILE_FORMAT') ON_ERROR = ABORT_STATEMENT;
+COPY INTO STAGE_SCH.MENU (
+    MENUID,
+    RESTAURANTID,
+    ITEMNAME,
+    DESCRIPTION,
+    PRICE,
+    CATEGORY,
+    AVAILABILITY,
+    ITEMTYPE,
+    CREATEDDATE,
+    MODIFIEDDATE,
+    STG_FILE_NAME,
+    STG_FILE_LOAD_TS,
+    STG_FILE_MD5,
+    COPY_DATA_TS
 )
-file_format = (format_name = 'stage_sch.csv_file_format')
-on_error = abort_statement;
-
-copy into stage_sch.orders (orderid, customerid, restaurantid, orderdate, totalamount, 
-                  status, paymentmethod, createddate, modifieddate,
-                  stg_file_name, stg_file_load_ts, stg_file_md5, copy_data_ts)
-from (
-    select 
-        t.$1::text as orderid,
-        t.$2::text as customerid,
-        t.$3::text as restaurantid,
-        t.$4::text as orderdate,
-        t.$5::text as totalamount,
-        t.$6::text as status,
-        t.$7::text as paymentmethod,
-        t.$8::text as createddate,
-        t.$9::text as modifieddate,
-        metadata$filename as stg_file_name,
-        metadata$file_last_modified as stg_file_load_ts,
-        metadata$file_content_key as stg_file_md5,
-        current_timestamp as copy_data_ts
-    from @stage_sch.csv_stg/initial/order/ t
+FROM (
+        SELECT T.$1::TEXT AS MENUID,
+            T.$2::TEXT AS RESTAURANTID,
+            T.$3::TEXT AS ITEMNAME,
+            T.$4::TEXT AS DESCRIPTION,
+            T.$5::TEXT AS PRICE,
+            T.$6::TEXT AS CATEGORY,
+            T.$7::TEXT AS AVAILABILITY,
+            T.$8::TEXT AS ITEMTYPE,
+            T.$9::TEXT AS CREATEDDATE,
+            T.$10::TEXT AS MODIFIEDDATE,
+            METADATA $FILENAME AS STG_FILE_NAME,
+            METADATA $FILE_LAST_MODIFIED AS STG_FILE_LOAD_TS,
+            METADATA $FILE_CONTENT_KEY AS STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM @STAGE_SCH.CSV_STG / INITIAL / MENU T
+    ) FILE_FORMAT = (FORMAT_NAME = 'STAGE_SCH.CSV_FILE_FORMAT') ON_ERROR = ABORT_STATEMENT;
+COPY INTO STAGE_SCH.DELIVERYAGENT (
+    DELIVERYAGENTID,
+    NAME,
+    PHONE,
+    VEHICLETYPE,
+    LOCATIONID,
+    STATUS,
+    GENDER,
+    RATING,
+    CREATEDDATE,
+    MODIFIEDDATE,
+    STG_FILE_NAME,
+    STG_FILE_LOAD_TS,
+    STG_FILE_MD5,
+    COPY_DATA_TS
 )
-file_format = (format_name = 'stage_sch.csv_file_format')
-on_error = abort_statement;
-
-
-copy into stage_sch.orderitem (orderitemid, orderid, menuid, quantity, price, 
-                     subtotal, createddate, modifieddate,
-                     stg_file_name, stg_file_load_ts, stg_file_md5, copy_data_ts)
-from (
-    select 
-        t.$1::text as orderitemid,
-        t.$2::text as orderid,
-        t.$3::text as menuid,
-        t.$4::text as quantity,
-        t.$5::text as price,
-        t.$6::text as subtotal,
-        t.$7::text as createddate,
-        t.$8::text as modifieddate,
-        metadata$filename as stg_file_name,
-        metadata$file_last_modified as stg_file_load_ts,
-        metadata$file_content_key as stg_file_md5,
-        current_timestamp as copy_data_ts
-    from @stage_sch.csv_stg/initial/order_item/ t
+FROM (
+        SELECT T.$1::TEXT AS DELIVERYAGENTID,
+            T.$2::TEXT AS NAME,
+            T.$3::TEXT AS PHONE,
+            T.$4::TEXT AS VEHICLETYPE,
+            T.$5::TEXT AS LOCATIONID,
+            T.$6::TEXT AS STATUS,
+            T.$7::TEXT AS GENDER,
+            T.$8::TEXT AS RATING,
+            T.$9::TEXT AS CREATEDDATE,
+            T.$10::TEXT AS MODIFIEDDATE,
+            METADATA $FILENAME AS STG_FILE_NAME,
+            METADATA $FILE_LAST_MODIFIED AS STG_FILE_LOAD_TS,
+            METADATA $FILE_CONTENT_KEY AS STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM @STAGE_SCH.CSV_STG / INITIAL / DELIVERY_AGENT T
+    ) FILE_FORMAT = (FORMAT_NAME = 'STAGE_SCH.CSV_FILE_FORMAT') ON_ERROR = ABORT_STATEMENT;
+COPY INTO STAGE_SCH.DELIVERY (
+    DELIVERYID,
+    ORDERID,
+    DELIVERYAGENTID,
+    DELIVERYSTATUS,
+    ESTIMATEDTIME,
+    ADDRESSID,
+    DELIVERYDATE,
+    CREATEDDATE,
+    MODIFIEDDATE,
+    STG_FILE_NAME,
+    STG_FILE_LOAD_TS,
+    STG_FILE_MD5,
+    COPY_DATA_TS
 )
-file_format = (format_name = 'stage_sch.csv_file_format')
-on_error = abort_statement;
+FROM (
+        SELECT T.$1::TEXT AS DELIVERYID,
+            T.$2::TEXT AS ORDERID,
+            T.$3::TEXT AS DELIVERYAGENTID,
+            T.$4::TEXT AS DELIVERYSTATUS,
+            T.$5::TEXT AS ESTIMATEDTIME,
+            T.$6::TEXT AS ADDRESSID,
+            T.$7::TEXT AS DELIVERYDATE,
+            T.$8::TEXT AS CREATEDDATE,
+            T.$9::TEXT AS MODIFIEDDATE,
+            METADATA $FILENAME AS STG_FILE_NAME,
+            METADATA $FILE_LAST_MODIFIED AS STG_FILE_LOAD_TS,
+            METADATA $FILE_CONTENT_KEY AS STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM @STAGE_SCH.CSV_STG / INITIAL / DELIVERY / T
+    ) FILE_FORMAT = (FORMAT_NAME = 'STAGE_SCH.CSV_FILE_FORMAT') ON_ERROR = ABORT_STATEMENT;
+COPY INTO STAGE_SCH.ORDERS (
+    ORDERID,
+    CUSTOMERID,
+    RESTAURANTID,
+    ORDERDATE,
+    TOTALAMOUNT,
+    STATUS,
+    PAYMENTMETHOD,
+    CREATEDDATE,
+    MODIFIEDDATE,
+    STG_FILE_NAME,
+    STG_FILE_LOAD_TS,
+    STG_FILE_MD5,
+    COPY_DATA_TS
+)
+FROM (
+        SELECT T.$1::TEXT AS ORDERID,
+            T.$2::TEXT AS CUSTOMERID,
+            T.$3::TEXT AS RESTAURANTID,
+            T.$4::TEXT AS ORDERDATE,
+            T.$5::TEXT AS TOTALAMOUNT,
+            T.$6::TEXT AS STATUS,
+            T.$7::TEXT AS PAYMENTMETHOD,
+            T.$8::TEXT AS CREATEDDATE,
+            T.$9::TEXT AS MODIFIEDDATE,
+            METADATA $FILENAME AS STG_FILE_NAME,
+            METADATA $FILE_LAST_MODIFIED AS STG_FILE_LOAD_TS,
+            METADATA $FILE_CONTENT_KEY AS STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM @STAGE_SCH.CSV_STG / INITIAL / ORDER / T
+    ) FILE_FORMAT = (FORMAT_NAME = 'STAGE_SCH.CSV_FILE_FORMAT') ON_ERROR = ABORT_STATEMENT;
+COPY INTO STAGE_SCH.ORDERITEM (
+    ORDERITEMID,
+    ORDERID,
+    MENUID,
+    QUANTITY,
+    PRICE,
+    SUBTOTAL,
+    CREATEDDATE,
+    MODIFIEDDATE,
+    STG_FILE_NAME,
+    STG_FILE_LOAD_TS,
+    STG_FILE_MD5,
+    COPY_DATA_TS
+)
+FROM (
+        SELECT T.$1::TEXT AS ORDERITEMID,
+            T.$2::TEXT AS ORDERID,
+            T.$3::TEXT AS MENUID,
+            T.$4::TEXT AS QUANTITY,
+            T.$5::TEXT AS PRICE,
+            T.$6::TEXT AS SUBTOTAL,
+            T.$7::TEXT AS CREATEDDATE,
+            T.$8::TEXT AS MODIFIEDDATE,
+            METADATA $FILENAME AS STG_FILE_NAME,
+            METADATA $FILE_LAST_MODIFIED AS STG_FILE_LOAD_TS,
+            METADATA $FILE_CONTENT_KEY AS STG_FILE_MD5,
+            CURRENT_TIMESTAMP AS COPY_DATA_TS
+        FROM @STAGE_SCH.CSV_STG / INITIAL / ORDER_ITEM / T
+    ) FILE_FORMAT = (FORMAT_NAME = 'STAGE_SCH.CSV_FILE_FORMAT') ON_ERROR = ABORT_STATEMENT;

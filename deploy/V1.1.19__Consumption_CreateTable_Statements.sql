@@ -1,126 +1,206 @@
-use role sysadmin;
-use database sandbox;
-use schema consumption_sch;
-USE WAREHOUSE compute_wh;
-
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE SCHEMA CONSUMPTION_SCH;
+USE WAREHOUSE COMPUTE_WH;
 CREATE OR REPLACE TABLE CONSUMPTION_SCH.RESTAURANT_DIM (
-    RESTAURANT_HK NUMBER primary key,                   -- Hash key for the restaurant location
-    RESTAURANT_ID NUMBER,                   -- Restaurant ID without auto-increment
-    NAME STRING(100),                       -- Restaurant name
-    CUISINE_TYPE STRING,                    -- Type of cuisine offered
-    PRICING_FOR_TWO NUMBER(10, 2),          -- Pricing for two people
-    RESTAURANT_PHONE STRING(15) WITH TAG (common.pii_policy_tag = 'SENSITIVE'),            -- Restaurant phone number
-    OPERATING_HOURS STRING(100),            -- Restaurant operating hours
-    LOCATION_ID_FK NUMBER,                  -- Foreign key reference to location
-    ACTIVE_FLAG STRING(10),                 -- Indicates if the restaurant is active
-    OPEN_STATUS STRING(10),                 -- Indicates if the restaurant is currently open
-    LOCALITY STRING(100),                   -- Locality of the restaurant
-    RESTAURANT_ADDRESS STRING,              -- Full address of the restaurant
-    LATITUDE NUMBER(9, 6),                  -- Latitude for the restaurant's location
-    LONGITUDE NUMBER(9, 6),                 -- Longitude for the restaurant's location
-    EFF_START_DATE TIMESTAMP_TZ,            -- Effective start date for the record
-    EFF_END_DATE TIMESTAMP_TZ,              -- Effective end date for the record (NULL if active)
-    IS_CURRENT BOOLEAN                     -- Indicates whether the record is the current version
-);
-
+        RESTAURANT_HK NUMBER PRIMARY KEY,
+        -- HASH KEY FOR THE RESTAURANT LOCATION
+        RESTAURANT_ID NUMBER,
+        -- RESTAURANT ID WITHOUT AUTO-INCREMENT
+        NAME STRING(100),
+        -- RESTAURANT NAME
+        CUISINE_TYPE STRING,
+        -- TYPE OF CUISINE OFFERED
+        PRICING_FOR_TWO NUMBER(10, 2),
+        -- PRICING FOR TWO PEOPLE
+        RESTAURANT_PHONE STRING(15) WITH TAG (COMMON.PII_POLICY_TAG = 'SENSITIVE'),
+        -- RESTAURANT PHONE NUMBER
+        OPERATING_HOURS STRING(100),
+        -- RESTAURANT OPERATING HOURS
+        LOCATION_ID_FK NUMBER,
+        -- FOREIGN KEY REFERENCE TO LOCATION
+        ACTIVE_FLAG STRING(10),
+        -- INDICATES IF THE RESTAURANT IS ACTIVE
+        OPEN_STATUS STRING(10),
+        -- INDICATES IF THE RESTAURANT IS CURRENTLY OPEN
+        LOCALITY STRING(100),
+        -- LOCALITY OF THE RESTAURANT
+        RESTAURANT_ADDRESS STRING,
+        -- FULL ADDRESS OF THE RESTAURANT
+        LATITUDE NUMBER(9, 6),
+        -- LATITUDE FOR THE RESTAURANT'S LOCATION
+        LONGITUDE NUMBER(9, 6),
+        -- LONGITUDE FOR THE RESTAURANT'S LOCATION
+        EFF_START_DATE TIMESTAMP_TZ,
+        -- EFFECTIVE START DATE FOR THE RECORD
+        EFF_END_DATE TIMESTAMP_TZ,
+        -- EFFECTIVE END DATE FOR THE RECORD (NULL IF ACTIVE)
+        IS_CURRENT BOOLEAN -- INDICATES WHETHER THE RECORD IS THE CURRENT VERSION
+    );
 CREATE OR REPLACE TABLE CONSUMPTION_SCH.CUSTOMER_DIM (
-    CUSTOMER_HK NUMBER PRIMARY KEY,               -- Surrogate key for the customer
-    CUSTOMER_ID STRING NOT NULL,                                 -- Natural key for the customer
-    NAME STRING(100) NOT NULL,                                   -- Customer name
-    MOBILE STRING(15) WITH TAG (common.pii_policy_tag = 'PII'),                                           -- Mobile number
-    EMAIL STRING(100) WITH TAG (common.pii_policy_tag = 'EMAIL'),                                           -- Email
-    LOGIN_BY_USING STRING(50),                                   -- Method of login
-    GENDER STRING(10) WITH TAG (common.pii_policy_tag = 'PII'),                                           -- Gender
-    DOB DATE WITH TAG (common.pii_policy_tag = 'PII'),                                                    -- Date of birth
-    ANNIVERSARY DATE,                                            -- Anniversary
-    PREFERENCES STRING,                                          -- Preferences
-    EFF_START_DATE TIMESTAMP_TZ,                                 -- Effective start date
-    EFF_END_DATE TIMESTAMP_TZ,                                   -- Effective end date (NULL if active)
-    IS_CURRENT BOOLEAN                                           -- Flag to indicate the current record
-);
-
+        CUSTOMER_HK NUMBER PRIMARY KEY,
+        -- SURROGATE KEY FOR THE CUSTOMER
+        CUSTOMER_ID STRING NOT NULL,
+        -- NATURAL KEY FOR THE CUSTOMER
+        NAME STRING(100) NOT NULL,
+        -- CUSTOMER NAME
+        MOBILE STRING(15) WITH TAG (COMMON.PII_POLICY_TAG = 'PII'),
+        -- MOBILE NUMBER
+        EMAIL STRING(100) WITH TAG (COMMON.PII_POLICY_TAG = 'EMAIL'),
+        -- EMAIL
+        LOGIN_BY_USING STRING(50),
+        -- METHOD OF LOGIN
+        GENDER STRING(10) WITH TAG (COMMON.PII_POLICY_TAG = 'PII'),
+        -- GENDER
+        DOB DATE WITH TAG (COMMON.PII_POLICY_TAG = 'PII'),
+        -- DATE OF BIRTH
+        ANNIVERSARY DATE,
+        -- ANNIVERSARY
+        PREFERENCES STRING,
+        -- PREFERENCES
+        EFF_START_DATE TIMESTAMP_TZ,
+        -- EFFECTIVE START DATE
+        EFF_END_DATE TIMESTAMP_TZ,
+        -- EFFECTIVE END DATE (NULL IF ACTIVE)
+        IS_CURRENT BOOLEAN -- FLAG TO INDICATE THE CURRENT RECORD
+    );
 CREATE OR REPLACE TABLE CONSUMPTION_SCH.CUSTOMER_ADDRESS_DIM (
-    CUSTOMER_ADDRESS_HK NUMBER PRIMARY KEY comment 'Customer Address HK (EDW)',        -- Surrogate key (hash key)
-    ADDRESS_ID INT comment 'Primary Key (Source System)',                                -- Original primary key
-    CUSTOMER_ID_FK STRING comment 'Customer FK (Source System)',                            -- Surrogate key from Customer Dimension (Foreign Key)
-    FLAT_NO STRING,                                -- Flat number
-    HOUSE_NO STRING,                               -- House number
-    FLOOR STRING,                                  -- Floor
-    BUILDING STRING,                               -- Building name
-    LANDMARK STRING,                               -- Landmark
-    LOCALITY STRING,                               -- Locality
-    CITY STRING,                                   -- City
-    STATE STRING,                                  -- State
-    PINCODE STRING,                                -- Pincode
-    COORDINATES STRING,                            -- Geo-coordinates
-    PRIMARY_FLAG STRING,                           -- Whether it's the primary address
-    ADDRESS_TYPE STRING,                           -- Type of address (e.g., Home, Office)
-
-    -- SCD2 Columns
-    EFF_START_DATE TIMESTAMP_TZ,                                 -- Effective start date
-    EFF_END_DATE TIMESTAMP_TZ,                                   -- Effective end date (NULL if active)
-    IS_CURRENT BOOLEAN                                           -- Flag to indicate the current record
-);
-
-CREATE OR REPLACE TABLE consumption_sch.menu_dim (
-    Menu_Dim_HK NUMBER primary key comment 'Menu Dim HK (EDW)',                         -- Hash key generated for Menu Dim table
-    Menu_ID INT NOT NULL comment 'Primary Key (Source System)',                       -- Unique and non-null Menu_ID
-    Restaurant_ID_FK INT NOT NULL comment 'Restaurant FK (Source System)',                          -- Identifier for the restaurant
-    Item_Name STRING,                            -- Name of the menu item
-    Description STRING,                         -- Description of the menu item
-    Price DECIMAL(10, 2),                       -- Price as a numeric value with 2 decimal places
-    Category STRING,                            -- Food category (e.g., North Indian)
-    Availability BOOLEAN,                       -- Availability status (True/False)
-    Item_Type STRING,                           -- Dietary classification (e.g., Vegan)
-    EFF_START_DATE TIMESTAMP_NTZ,               -- Effective start date of the record
-    EFF_END_DATE TIMESTAMP_NTZ,                 -- Effective end date of the record
-    IS_CURRENT BOOLEAN                         -- Flag to indicate if the record is current (True/False)
-);
-
-CREATE OR REPLACE TABLE consumption_sch.delivery_agent_dim (
-    delivery_agent_hk number primary key comment 'Delivery Agend Dim HK (EDW)',               -- Hash key for unique identification
-    delivery_agent_id NUMBER not null comment 'Primary Key (Source System)',               -- Business key
-    name STRING NOT NULL,                   -- Delivery agent name
-    phone STRING UNIQUE,                    -- Phone number, unique
-    vehicle_type STRING,                    -- Type of vehicle
-    location_id_fk NUMBER NOT NULL comment 'Location FK (Source System)',                     -- Location ID
-    status STRING,                          -- Current status of the delivery agent
-    gender STRING,                          -- Gender
-    rating NUMBER(4,2),                     -- Rating with one decimal precision
-    eff_start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Effective start date
-    eff_end_date TIMESTAMP,                 -- Effective end date (NULL for active record)
-    is_current BOOLEAN DEFAULT TRUE
-);
-
+        CUSTOMER_ADDRESS_HK NUMBER PRIMARY KEY COMMENT 'CUSTOMER ADDRESS HK (EDW)',
+        -- SURROGATE KEY (HASH KEY)
+        ADDRESS_ID INT COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- ORIGINAL PRIMARY KEY
+        CUSTOMER_ID_FK STRING COMMENT 'CUSTOMER FK (SOURCE SYSTEM)',
+        -- SURROGATE KEY FROM CUSTOMER DIMENSION (FOREIGN KEY)
+        FLAT_NO STRING,
+        -- FLAT NUMBER
+        HOUSE_NO STRING,
+        -- HOUSE NUMBER
+        FLOOR STRING,
+        -- FLOOR
+        BUILDING STRING,
+        -- BUILDING NAME
+        LANDMARK STRING,
+        -- LANDMARK
+        LOCALITY STRING,
+        -- LOCALITY
+        CITY STRING,
+        -- CITY
+        STATE STRING,
+        -- STATE
+        PINCODE STRING,
+        -- PINCODE
+        COORDINATES STRING,
+        -- GEO-COORDINATES
+        PRIMARY_FLAG STRING,
+        -- WHETHER IT'S THE PRIMARY ADDRESS
+        ADDRESS_TYPE STRING,
+        -- TYPE OF ADDRESS (E.G., HOME, OFFICE)
+        -- SCD2 COLUMNS
+        EFF_START_DATE TIMESTAMP_TZ,
+        -- EFFECTIVE START DATE
+        EFF_END_DATE TIMESTAMP_TZ,
+        -- EFFECTIVE END DATE (NULL IF ACTIVE)
+        IS_CURRENT BOOLEAN -- FLAG TO INDICATE THE CURRENT RECORD
+    );
+CREATE OR REPLACE TABLE CONSUMPTION_SCH.MENU_DIM (
+        MENU_DIM_HK NUMBER PRIMARY KEY COMMENT 'MENU DIM HK (EDW)',
+        -- HASH KEY GENERATED FOR MENU DIM TABLE
+        MENU_ID INT NOT NULL COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- UNIQUE AND NON-NULL MENU_ID
+        RESTAURANT_ID_FK INT NOT NULL COMMENT 'RESTAURANT FK (SOURCE SYSTEM)',
+        -- IDENTIFIER FOR THE RESTAURANT
+        ITEM_NAME STRING,
+        -- NAME OF THE MENU ITEM
+        DESCRIPTION STRING,
+        -- DESCRIPTION OF THE MENU ITEM
+        PRICE DECIMAL(10, 2),
+        -- PRICE AS A NUMERIC VALUE WITH 2 DECIMAL PLACES
+        CATEGORY STRING,
+        -- FOOD CATEGORY (E.G., NORTH INDIAN)
+        AVAILABILITY BOOLEAN,
+        -- AVAILABILITY STATUS (TRUE/FALSE)
+        ITEM_TYPE STRING,
+        -- DIETARY CLASSIFICATION (E.G., VEGAN)
+        EFF_START_DATE TIMESTAMP_NTZ,
+        -- EFFECTIVE START DATE OF THE RECORD
+        EFF_END_DATE TIMESTAMP_NTZ,
+        -- EFFECTIVE END DATE OF THE RECORD
+        IS_CURRENT BOOLEAN -- FLAG TO INDICATE IF THE RECORD IS CURRENT (TRUE/FALSE)
+    );
+CREATE OR REPLACE TABLE CONSUMPTION_SCH.DELIVERY_AGENT_DIM (
+        DELIVERY_AGENT_HK NUMBER PRIMARY KEY COMMENT 'DELIVERY AGEND DIM HK (EDW)',
+        -- HASH KEY FOR UNIQUE IDENTIFICATION
+        DELIVERY_AGENT_ID NUMBER NOT NULL COMMENT 'PRIMARY KEY (SOURCE SYSTEM)',
+        -- BUSINESS KEY
+        NAME STRING NOT NULL,
+        -- DELIVERY AGENT NAME
+        PHONE STRING UNIQUE,
+        -- PHONE NUMBER, UNIQUE
+        VEHICLE_TYPE STRING,
+        -- TYPE OF VEHICLE
+        LOCATION_ID_FK NUMBER NOT NULL COMMENT 'LOCATION FK (SOURCE SYSTEM)',
+        -- LOCATION ID
+        STATUS STRING,
+        -- CURRENT STATUS OF THE DELIVERY AGENT
+        GENDER STRING,
+        -- GENDER
+        RATING NUMBER(4, 2),
+        -- RATING WITH ONE DECIMAL PRECISION
+        EFF_START_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        -- EFFECTIVE START DATE
+        EFF_END_DATE TIMESTAMP,
+        -- EFFECTIVE END DATE (NULL FOR ACTIVE RECORD)
+        IS_CURRENT BOOLEAN DEFAULT TRUE
+    );
 CREATE OR REPLACE TABLE CONSUMPTION_SCH.DATE_DIM (
-    DATE_DIM_HK NUMBER PRIMARY KEY comment 'Menu Dim HK (EDW)',   -- Surrogate key for date dimension
-    CALENDAR_DATE DATE UNIQUE,                     -- The actual calendar date
-    YEAR NUMBER,                                   -- Year
-    QUARTER NUMBER,                                -- Quarter (1-4)
-    MONTH NUMBER,                                  -- Month (1-12)
-    WEEK NUMBER,                                   -- Week of the year
-    DAY_OF_YEAR NUMBER,                            -- Day of the year (1-365/366)
-    DAY_OF_WEEK NUMBER,                            -- Day of the week (1-7)
-    DAY_OF_THE_MONTH NUMBER,                       -- Day of the month (1-31)
-    DAY_NAME STRING                                -- Name of the day (e.g., Monday)
-)
-comment = 'Date dimension table created using min of order data.';
-
-CREATE OR REPLACE TABLE consumption_sch.order_item_fact (
-    order_item_fact_sk NUMBER AUTOINCREMENT comment 'Surrogate Key (EDW)', -- Surrogate key for the fact table
-    order_item_id NUMBER  comment 'Order Item FK (Source System)',                    -- Natural key from the source data
-    order_id NUMBER  comment 'Order FK (Source System)',                         -- Reference to the order dimension
-    customer_dim_key NUMBER  comment 'Order FK (Source System)',                      -- Reference to the customer dimension
-    customer_address_dim_key NUMBER,                      -- Reference to the customer dimension
-    restaurant_dim_key NUMBER,                    -- Reference to the restaurant dimension
-    restaurant_location_dim_key NUMBER,                    -- Reference to the restaurant dimension
-    menu_dim_key NUMBER,                          -- Reference to the menu dimension
-    delivery_agent_dim_key NUMBER,                -- Reference to the delivery agent dimension
-    order_date_dim_key NUMBER,                         -- Reference to the date dimension
-    quantity NUMBER,                          -- Measure
-    price NUMBER(10, 2),                            -- Measure
-    subtotal NUMBER(10, 2),                         -- Measure
-    delivery_status VARCHAR,                        -- Delivery information
-    estimated_time VARCHAR                          -- Delivery information
-);
-
+        DATE_DIM_HK NUMBER PRIMARY KEY COMMENT 'MENU DIM HK (EDW)',
+        -- SURROGATE KEY FOR DATE DIMENSION
+        CALENDAR_DATE DATE UNIQUE,
+        -- THE ACTUAL CALENDAR DATE
+        YEAR NUMBER,
+        -- YEAR
+        QUARTER NUMBER,
+        -- QUARTER (1-4)
+        MONTH NUMBER,
+        -- MONTH (1-12)
+        WEEK NUMBER,
+        -- WEEK OF THE YEAR
+        DAY_OF_YEAR NUMBER,
+        -- DAY OF THE YEAR (1-365/366)
+        DAY_OF_WEEK NUMBER,
+        -- DAY OF THE WEEK (1-7)
+        DAY_OF_THE_MONTH NUMBER,
+        -- DAY OF THE MONTH (1-31)
+        DAY_NAME STRING -- NAME OF THE DAY (E.G., MONDAY)
+    ) COMMENT = 'DATE DIMENSION TABLE CREATED USING MIN OF ORDER DATA.';
+CREATE OR REPLACE TABLE CONSUMPTION_SCH.ORDER_ITEM_FACT (
+        ORDER_ITEM_FACT_SK NUMBER AUTOINCREMENT COMMENT 'SURROGATE KEY (EDW)',
+        -- SURROGATE KEY FOR THE FACT TABLE
+        ORDER_ITEM_ID NUMBER COMMENT 'ORDER ITEM FK (SOURCE SYSTEM)',
+        -- NATURAL KEY FROM THE SOURCE DATA
+        ORDER_ID NUMBER COMMENT 'ORDER FK (SOURCE SYSTEM)',
+        -- REFERENCE TO THE ORDER DIMENSION
+        CUSTOMER_DIM_KEY NUMBER COMMENT 'ORDER FK (SOURCE SYSTEM)',
+        -- REFERENCE TO THE CUSTOMER DIMENSION
+        CUSTOMER_ADDRESS_DIM_KEY NUMBER,
+        -- REFERENCE TO THE CUSTOMER DIMENSION
+        RESTAURANT_DIM_KEY NUMBER,
+        -- REFERENCE TO THE RESTAURANT DIMENSION
+        RESTAURANT_LOCATION_DIM_KEY NUMBER,
+        -- REFERENCE TO THE RESTAURANT DIMENSION
+        MENU_DIM_KEY NUMBER,
+        -- REFERENCE TO THE MENU DIMENSION
+        DELIVERY_AGENT_DIM_KEY NUMBER,
+        -- REFERENCE TO THE DELIVERY AGENT DIMENSION
+        ORDER_DATE_DIM_KEY NUMBER,
+        -- REFERENCE TO THE DATE DIMENSION
+        QUANTITY NUMBER,
+        -- MEASURE
+        PRICE NUMBER(10, 2),
+        -- MEASURE
+        SUBTOTAL NUMBER(10, 2),
+        -- MEASURE
+        DELIVERY_STATUS VARCHAR,
+        -- DELIVERY INFORMATION
+        ESTIMATED_TIME VARCHAR -- DELIVERY INFORMATION
+    );

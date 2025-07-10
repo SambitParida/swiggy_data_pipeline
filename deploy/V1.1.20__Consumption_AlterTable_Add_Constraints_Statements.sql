@@ -1,39 +1,18 @@
-use role sysadmin;
-use database sandbox;
-use schema consumption_sch;
-USE WAREHOUSE compute_wh;
-
-alter table consumption_sch.order_item_fact
-    add constraint fk_order_item_fact_customer_dim
-    foreign key (customer_dim_key)
-    references consumption_sch.customer_dim (customer_hk);
-
-alter table consumption_sch.order_item_fact
-    add constraint fk_order_item_fact_customer_address_dim
-    foreign key (customer_address_dim_key)
-    references consumption_sch.customer_address_dim (CUSTOMER_ADDRESS_HK);
-
-alter table consumption_sch.order_item_fact
-    add constraint fk_order_item_fact_restaurant_dim
-    foreign key (restaurant_dim_key)
-    references consumption_sch.restaurant_dim (restaurant_hk);
-
-alter table consumption_sch.order_item_fact
-    add constraint fk_order_item_fact_restaurant_location_dim
-    foreign key (restaurant_location_dim_key)
-    references consumption_sch.restaurant_location_dim (restaurant_location_hk);
-
-alter table consumption_sch.order_item_fact
-    add constraint fk_order_item_fact_menu_dim
-    foreign key (menu_dim_key)
-    references consumption_sch.menu_dim (menu_dim_hk);
-
-alter table consumption_sch.order_item_fact
-    add constraint fk_order_item_fact_delivery_agent_dim
-    foreign key (delivery_agent_dim_key)
-    references consumption_sch.delivery_agent_dim (delivery_agent_hk);
-
-alter table consumption_sch.order_item_fact
-    add constraint fk_order_item_fact_delivery_date_dim
-    foreign key (order_date_dim_key)
-    references consumption_sch.date_dim (date_dim_hk);
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE SCHEMA CONSUMPTION_SCH;
+USE WAREHOUSE COMPUTE_WH;
+ALTER TABLE CONSUMPTION_SCH.ORDER_ITEM_FACT
+ADD CONSTRAINT FK_ORDER_ITEM_FACT_CUSTOMER_DIM FOREIGN KEY (CUSTOMER_DIM_KEY) REFERENCES CONSUMPTION_SCH.CUSTOMER_DIM (CUSTOMER_HK);
+ALTER TABLE CONSUMPTION_SCH.ORDER_ITEM_FACT
+ADD CONSTRAINT FK_ORDER_ITEM_FACT_CUSTOMER_ADDRESS_DIM FOREIGN KEY (CUSTOMER_ADDRESS_DIM_KEY) REFERENCES CONSUMPTION_SCH.CUSTOMER_ADDRESS_DIM (CUSTOMER_ADDRESS_HK);
+ALTER TABLE CONSUMPTION_SCH.ORDER_ITEM_FACT
+ADD CONSTRAINT FK_ORDER_ITEM_FACT_RESTAURANT_DIM FOREIGN KEY (RESTAURANT_DIM_KEY) REFERENCES CONSUMPTION_SCH.RESTAURANT_DIM (RESTAURANT_HK);
+ALTER TABLE CONSUMPTION_SCH.ORDER_ITEM_FACT
+ADD CONSTRAINT FK_ORDER_ITEM_FACT_RESTAURANT_LOCATION_DIM FOREIGN KEY (RESTAURANT_LOCATION_DIM_KEY) REFERENCES CONSUMPTION_SCH.RESTAURANT_LOCATION_DIM (RESTAURANT_LOCATION_HK);
+ALTER TABLE CONSUMPTION_SCH.ORDER_ITEM_FACT
+ADD CONSTRAINT FK_ORDER_ITEM_FACT_MENU_DIM FOREIGN KEY (MENU_DIM_KEY) REFERENCES CONSUMPTION_SCH.MENU_DIM (MENU_DIM_HK);
+ALTER TABLE CONSUMPTION_SCH.ORDER_ITEM_FACT
+ADD CONSTRAINT FK_ORDER_ITEM_FACT_DELIVERY_AGENT_DIM FOREIGN KEY (DELIVERY_AGENT_DIM_KEY) REFERENCES CONSUMPTION_SCH.DELIVERY_AGENT_DIM (DELIVERY_AGENT_HK);
+ALTER TABLE CONSUMPTION_SCH.ORDER_ITEM_FACT
+ADD CONSTRAINT FK_ORDER_ITEM_FACT_DELIVERY_DATE_DIM FOREIGN KEY (ORDER_DATE_DIM_KEY) REFERENCES CONSUMPTION_SCH.DATE_DIM (DATE_DIM_HK);

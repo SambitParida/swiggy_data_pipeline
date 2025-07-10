@@ -1,14 +1,9 @@
--- Use SysAdmin role to create objects --
-use role sysadmin;
-
--- Use Database --
-use database sandbox;
-
--- Create Schemas --
-create schema if not exists stage_sch;
-create schema if not exists clean_sch;
-create schema if not exists consumption_sch;
-create schema if not exists common;
-
-
-
+-- USE SYSADMIN ROLE TO CREATE OBJECTS --
+USE ROLE SYSADMIN;
+-- USE DATABASE --
+USE DATABASE SANDBOX;
+-- CREATE SCHEMAS --
+CREATE SCHEMA IF NOT EXISTS STAGE_SCH;
+CREATE SCHEMA IF NOT EXISTS CLEAN_SCH;
+CREATE SCHEMA IF NOT EXISTS CONSUMPTION_SCH;
+CREATE SCHEMA IF NOT EXISTS COMMON;

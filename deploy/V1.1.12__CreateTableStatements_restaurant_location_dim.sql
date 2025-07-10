@@ -1,22 +1,31 @@
-use role sysadmin;
-use database sandbox;
-USE WAREHOUSE compute_wh;
-
-/*Create tables in schema stage_sch */
-
-create or replace table consumption_sch.restaurant_location_dim (
-    restaurant_location_hk NUMBER primary key,                      -- hash key for the dimension
-    location_id number(38,0) not null,                  -- business key
-    city varchar(100) not null,                         -- city
-    state varchar(100) not null,                        -- state
-    state_code varchar(2) not null,                     -- state code
-    is_union_territory boolean not null default false,   -- union territory flag
-    capital_city_flag boolean not null default false,     -- capital city flag
-    city_tier varchar(6),                               -- city tier
-    zip_code varchar(10) not null,                      -- zip code
-    active_flag varchar(10) not null,                   -- active flag (indicating current record)
-    eff_start_dt timestamp_tz(9) not null,              -- effective start date for scd2
-    eff_end_dt timestamp_tz(9),                         -- effective end date for scd2
-    current_flag boolean not null default true         -- indicator of the current record
-)
-comment = 'Dimension table for restaurant location with scd2 (slowly changing dimension) enabled and hashkey as surrogate key';
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+/*CREATE TABLES IN SCHEMA STAGE_SCH */
+CREATE OR REPLACE TABLE CONSUMPTION_SCH.RESTAURANT_LOCATION_DIM (
+        RESTAURANT_LOCATION_HK NUMBER PRIMARY KEY,
+        -- HASH KEY FOR THE DIMENSION
+        LOCATION_ID NUMBER(38, 0) NOT NULL,
+        -- BUSINESS KEY
+        CITY VARCHAR(100) NOT NULL,
+        -- CITY
+        STATE VARCHAR(100) NOT NULL,
+        -- STATE
+        STATE_CODE VARCHAR(2) NOT NULL,
+        -- STATE CODE
+        IS_UNION_TERRITORY BOOLEAN NOT NULL DEFAULT FALSE,
+        -- UNION TERRITORY FLAG
+        CAPITAL_CITY_FLAG BOOLEAN NOT NULL DEFAULT FALSE,
+        -- CAPITAL CITY FLAG
+        CITY_TIER VARCHAR(6),
+        -- CITY TIER
+        ZIP_CODE VARCHAR(10) NOT NULL,
+        -- ZIP CODE
+        ACTIVE_FLAG VARCHAR(10) NOT NULL,
+        -- ACTIVE FLAG (INDICATING CURRENT RECORD)
+        EFF_START_DT TIMESTAMP_TZ(9) NOT NULL,
+        -- EFFECTIVE START DATE FOR SCD2
+        EFF_END_DT TIMESTAMP_TZ(9),
+        -- EFFECTIVE END DATE FOR SCD2
+        CURRENT_FLAG BOOLEAN NOT NULL DEFAULT TRUE -- INDICATOR OF THE CURRENT RECORD
+    ) COMMENT = 'DIMENSION TABLE FOR RESTAURANT LOCATION WITH SCD2 (SLOWLY CHANGING DIMENSION) ENABLED AND HASHKEY AS SURROGATE KEY';
