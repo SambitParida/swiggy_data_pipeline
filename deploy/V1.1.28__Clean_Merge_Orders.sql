@@ -8,9 +8,9 @@ merge into
     clean_sch.ORDERS as target using (
         select
             try_cast(ORDERID as number) as ORDER_ID,
-            try_cast(CUSTOMERID as string) as CUSTOMER_ID_FK,
-            try_cast(RESTAURANTID as string) as RESTAURANT_ID_FK,
-            try_cast(ORDERDATE as string) as ORDER_DATE,
+            try_cast(CUSTOMERID as number) as CUSTOMER_ID_FK,
+            try_cast(RESTAURANTID as number) as RESTAURANT_ID_FK,
+            TRY_TO_TIMESTAMP_NTZ(orderdate, 'YYYY-MM-DD HH24:MI:SS.FF6') as ORDER_DATE,
             try_cast(TOTALAMOUNT as number(38,3)) as TOTAL_AMOUNT,
             try_cast(STATUS as STRING) as STATUS,
             try_cast(PAYMENTMETHOD as string) as PAYMENT_METHOD,
