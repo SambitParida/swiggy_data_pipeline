@@ -49,6 +49,7 @@ SET TARGET.NAME = SOURCE.NAME,
 INSERT (
         CUSTOMER_ID,
         NAME,
+        MOBILE,
         EMAIL,
         LOGIN_BY_USING,
         GENDER,
@@ -65,6 +66,7 @@ INSERT (
 VALUES (
         SOURCE.CUSTOMER_ID,
         SOURCE.NAME,
+        SOURCE.MOBILE,
         SOURCE.EMAIL,
         SOURCE.LOGIN_BY_USING,
         SOURCE.GENDER,
