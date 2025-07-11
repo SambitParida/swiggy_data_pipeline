@@ -51,8 +51,6 @@ VALUES (
         SOURCE.DOB,
         SOURCE.ANNIVERSARY,
         SOURCE.PREFERENCES,
-        SOURCE.LATITUDE,
-        SOURCE.LONGITUDE,
         CURRENT_TIMESTAMP(),
         NULL,
         TRUE
@@ -98,8 +96,6 @@ VALUES (
         SOURCE.DOB,
         SOURCE.ANNIVERSARY,
         SOURCE.PREFERENCES,
-        SOURCE.LATITUDE,
-        SOURCE.LONGITUDE,
         CURRENT_TIMESTAMP(),
         NULL,
         TRUE
