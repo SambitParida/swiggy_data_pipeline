@@ -92,7 +92,8 @@ VALUES (
         HASH(
             SHA1_HEX(
                 CONCAT(
-                    SOURCE.RESTAURANT_ID SOURCE.NAME,
+                    SOURCE.RESTAURANT_ID,
+                    SOURCE.NAME,
                     SOURCE.CUISINE_TYPE,
                     SOURCE.PRICING_FOR_TWO,
                     SOURCE.RESTAURANT_PHONE,
