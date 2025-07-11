@@ -1,0 +1,126 @@
+USE ROLE SYSADMIN;
+USE DATABASE SANDBOX;
+USE WAREHOUSE COMPUTE_WH;
+MERGE INTO CONSUMPTION_SCH.RESTAURANT_DIM AS TARGET USING CLEAN_SCH.RESTAURANT_STM AS SOURCE ON TARGET.RESTAURANT_ID = SOURCE.RESTAURANT_ID
+AND TARGET.ACTIVE_FLAG = SOURCE.ACTIVE_FLAG
+WHEN MATCHED
+AND SOURCE.METADATA$ACTION = 'DELETE'
+AND SOURCE.METADATA$ISUPDATE = TRUE THEN
+UPDATE
+SET TARGET.EFF_END_DT = CURRENT_TIMESTAMP(),
+    TARGET.IS_CURRENT = FALSE
+    WHEN NOT MATCHED
+    AND SOURCE.METADATA $ACTION = 'INSERT'
+    AND SOURCE.METADATA $ISUPDATE = TRUE THEN
+INSERT (
+        RESTAURANT_HK,
+        RESTAURANT_ID,
+        NAME,
+        CUISINE_TYPE,
+        PRICING_FOR_TWO,
+        RESTAURANT_PHONE,
+        OPERATING_HOURS,
+        LOCATION_ID_FK,
+        ACTIVE_FLAG,
+        OPEN_STATUS,
+        LOCALITY,
+        RESTAURANT_ADDRESS,
+        LATITUDE,
+        LONGITUDE,
+        EFF_START_DATE,
+        EFF_END_DATE,
+        IS_CURRENT
+    )
+VALUES (
+        HASH(
+            SHA1_HEX(
+                CONCAT(
+                    SOURCE.RESTAURANT_ID,
+                    SOURCE.NAME,
+                    SOURCE.CUISINE_TYPE,
+                    SOURCE.PRICING_FOR_TWO,
+                    SOURCE.RESTAURANT_PHONE,
+                    SOURCE.OPERATING_HOURS,
+                    SOURCE.LOCATION_ID_FK,
+                    SOURCE.ACTIVE_FLAG,
+                    SOURCE.OPEN_STATUS,
+                    SOURCE.LOCALITY,
+                    SOURCE.RESTAURANT_ADDRESS,
+                    SOURCE.LATITUDE,
+                    SOURCE.LONGITUDE
+                )
+            )
+        ),
+        SOURCE.RESTAURANT_ID,
+        SOURCE.NAME,
+        SOURCE.CUISINE_TYPE,
+        SOURCE.PRICING_FOR_TWO,
+        SOURCE.RESTAURANT_PHONE,
+        SOURCE.OPERATING_HOURS,
+        SOURCE.LOCATION_ID_FK,
+        SOURCE.ACTIVE_FLAG,
+        SOURCE.OPEN_STATUS,
+        SOURCE.LOCALITY,
+        SOURCE.RESTAURANT_ADDRESS,
+        SOURCE.LATITUDE,
+        SOURCE.LONGITUDE,
+        CURRENT_TIMESTAMP(),
+        NULL,
+        TRUE
+    )
+    WHEN NOT MATCHED THEN
+INSERT (
+        RESTAURANT_HK,
+        RESTAURANT_ID,
+        NAME,
+        CUISINE_TYPE,
+        PRICING_FOR_TWO,
+        RESTAURANT_PHONE,
+        OPERATING_HOURS,
+        LOCATION_ID_FK,
+        ACTIVE_FLAG,
+        OPEN_STATUS,
+        LOCALITY,
+        RESTAURANT_ADDRESS,
+        LATITUDE,
+        LONGITUDE,
+        EFF_START_DATE,
+        EFF_END_DATE,
+        IS_CURRENT
+    )
+VALUES (
+        HASH(
+            SHA1_HEX(
+                CONCAT(
+                    SOURCE.RESTAURANT_ID SOURCE.NAME,
+                    SOURCE.CUISINE_TYPE,
+                    SOURCE.PRICING_FOR_TWO,
+                    SOURCE.RESTAURANT_PHONE,
+                    SOURCE.OPERATING_HOURS,
+                    SOURCE.LOCATION_ID_FK,
+                    SOURCE.ACTIVE_FLAG,
+                    SOURCE.OPEN_STATUS,
+                    SOURCE.LOCALITY,
+                    SOURCE.RESTAURANT_ADDRESS,
+                    SOURCE.LATITUDE,
+                    SOURCE.LONGITUDE
+                )
+            )
+        ),
+        SOURCE.RESTAURANT_ID,
+        SOURCE.NAME,
+        SOURCE.CUISINE_TYPE,
+        SOURCE.PRICING_FOR_TWO,
+        SOURCE.RESTAURANT_PHONE,
+        SOURCE.OPERATING_HOURS,
+        SOURCE.LOCATION_ID_FK,
+        SOURCE.ACTIVE_FLAG,
+        SOURCE.OPEN_STATUS,
+        SOURCE.LOCALITY,
+        SOURCE.RESTAURANT_ADDRESS,
+        SOURCE.LATITUDE,
+        SOURCE.LONGITUDE,
+        CURRENT_TIMESTAMP(),
+        NULL,
+        TRUE
+    );
