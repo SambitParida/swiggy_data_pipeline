@@ -48,7 +48,7 @@ select
     t.$5::text as activeflag,
     t.$6::text as createddate,
     t.$7::text as modifieddate    
- from @stage_sch.csv_stg/initial/location
+ from @stage_sch.csv_stg/initial/customer_address
  (file_format => 'stage_sch.csv_file_format') t
 
 

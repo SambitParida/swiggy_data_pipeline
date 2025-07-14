@@ -50,3 +50,39 @@ CREATE OR REPLACE WAREHOUSE data_load_wh WAREHOUSE_SIZE=LARGE INITIALLY_SUSPENDE
 select current_role()
 use role accountadmin
 grant usage on warehouse compute_wh to public;
+
+
+
+SELECT * FROM       CONCAT(
+                    SOURCE.ADDRESS_ID,
+                    SOURCE.CUSTOMER_ID_FK,
+                    SOURCE.FLAT_NO,
+                    SOURCE.HOUSE_NO,
+                    SOURCE.FLOOR,
+                    SOURCE.BUILDING,
+                    SOURCE.LANDMARK,
+                    SOURCE.LOCALITY,
+                    SOURCE.CITY,
+                    SOURCE.STATE,
+                    SOURCE.PINCODE,
+                    SOURCE.COORDINATES,
+                    SOURCE.PRIMARY_FLAG,
+                    SOURCE.ADDRESS_TYPE
+                ) AS A ,
+        SOURCE.ADDRESS_ID,
+        SOURCE.CUSTOMER_ID_FK,
+        SOURCE.FLAT_NO,
+        SOURCE.HOUSE_NO,
+        SOURCE.FLOOR,
+        SOURCE.BUILDING,
+        SOURCE.LANDMARK,
+        SOURCE.LOCALITY,
+        SOURCE.CITY,
+        SOURCE.STATE,
+        SOURCE.PINCODE,
+        SOURCE.COORDINATES,
+        SOURCE.PRIMARY_FLAG,
+        SOURCE.ADDRESS_TYPE,
+        CURRENT_TIMESTAMP(),
+        NULL,
+        TRUE FROM CLEAN_SCH.CUSTOMERADDRESS_STM SOURCE;
