@@ -3,22 +3,22 @@ USE DATABASE SANDBOX;
 USE WAREHOUSE COMPUTE_WH;
 USE SCHEMA CONSUMPTION_SCH;
 
-create or replace view consumption_sch.vw_yearly_revenue_kpis as
-select
-    d.year as year, -- fetch year from date_dim
-    sum(fact.subtotal) as total_revenue,
-    count(distinct fact.order_id) as total_orders,
-    round(sum(fact.subtotal) / count(distinct fact.order_id), 2) as avg_revenue_per_order,
-    round(sum(fact.subtotal) / count(fact.order_item_id), 2) as avg_revenue_per_item,
-    max(fact.subtotal) as max_order_value
-from
-    consumption_sch.order_item_fact fact
-join
-    consumption_sch.date_dim d
-on
-    fact.order_date_dim_key = d.date_dim_hk -- join fact table with date_dim table
-where DELIVERY_STATUS = 'Delivered'
-group by
-    d.year
-order by
-    d.year;
+CREATE OR REPLACE VIEW CONSUMPTION_SCH.VW_YEARLY_REVENUE_KPIS AS
+SELECT
+    D.YEAR AS YEAR, -- FETCH YEAR FROM DATE_DIM
+    SUM(FACT.SUBTOTAL) AS TOTAL_REVENUE,
+    COUNT(DISTINCT FACT.ORDER_ID) AS TOTAL_ORDERS,
+    ROUND(SUM(FACT.SUBTOTAL) / COUNT(DISTINCT FACT.ORDER_ID), 2) AS AVG_REVENUE_PER_ORDER,
+    ROUND(SUM(FACT.SUBTOTAL) / COUNT(FACT.ORDER_ITEM_ID), 2) AS AVG_REVENUE_PER_ITEM,
+    MAX(FACT.SUBTOTAL) AS MAX_ORDER_VALUE
+FROM
+    CONSUMPTION_SCH.ORDER_ITEM_FACT FACT
+JOIN
+    CONSUMPTION_SCH.DATE_DIM D
+ON
+    FACT.ORDER_DATE_DIM_KEY = D.DATE_DIM_HK -- JOIN FACT TABLE WITH DATE_DIM TABLE
+WHERE DELIVERY_STATUS = 'DELIVERED'
+GROUP BY
+    D.YEAR
+ORDER BY
+    D.YEAR;
