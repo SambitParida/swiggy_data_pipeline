@@ -10,8 +10,9 @@ The implementation involves below key activities
 5. Create business views and dynamic tables to support reporting analytics.
 6. Perform tag based column level data masking to obfuscate PII data.
 
-## Data Model
+## Data Flow Diagram
 
+![Alt text](swiggy_data_pipeline/pics/DataFlow_Swiggy.png)
 
 
 ## Snowflake Concepts used
