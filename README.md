@@ -1,3 +1,19 @@
+# Project Name
+Create a data pipeline for an Online food ordering platform to support analytical decisions.
+
+# Project Description
+the implementation involves below key activities
+1. Ingest related data (customer, restaurant, location, address, menu and order etc.) from various sources as internal stages.
+2. Identify dimensions and facts. Design data pipeline involving bronze, silver and gold layers following medallion architecture 
+3. Curate source data and merge to create a snapshot view by implementing SCD1.
+4. Identify changes in dimension tables and maintain history in gold (consumption) layer.
+5. Create business views and dynamic tables to support reporting analytics.
+6. Perform tag based column level data masking to obfuscate PII data.
+
+# Data Model
+
+
+
 # Snowflake Concepts used
 
 1. Internal stage

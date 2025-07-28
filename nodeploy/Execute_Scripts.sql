@@ -86,3 +86,21 @@ SELECT * FROM       CONCAT(
         CURRENT_TIMESTAMP(),
         NULL,
         TRUE FROM CLEAN_SCH.CUSTOMERADDRESS_STM SOURCE;
+
+
+---------------------
+
+use role accountadmin;
+use role sysadmin;
+use role public;
+
+use role useradmin;
+use database sandbox;
+select * from STAGE_SCH.CUSTOMER;
+
+grant usage on database sandbox to public;
+grant usage on schema stage_sch to public;
+grant select on STAGE_SCH.CUSTOMER to public;
+
+use schema stage_sch;
+show masking policies;
