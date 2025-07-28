@@ -12,7 +12,7 @@ The implementation involves below key activities
 
 ## Data Flow Diagram
 
-![Alt text](swiggy_data_pipeline/pics/DataFlow_Swiggy.png)
+![Alt text](https://github.com/SambitParida/swiggy_data_pipeline/blob/dev/pics/DataFlow_Swiggy.png)
 
 
 ## Snowflake Concepts used
