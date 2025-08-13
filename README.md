@@ -27,3 +27,8 @@ The implementation involves below key activities
 Tools Used: 
 1. Snowflake Business Critical Edition
 2. VSCODE
+
+
+## References  
+https://www.youtube.com/watch?v=IktHL33Wgug&t=7053s  
+Data Engineering Simplified
